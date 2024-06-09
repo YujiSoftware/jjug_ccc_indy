@@ -439,6 +439,443 @@ public boolean isOdd(java.util.List<java.lang.Integer>);
  16: ireturn
 ```
 
+---
+class: center, middle
+
+# 文字列結合と invokedynamic
+
+---
+
+# Java での文字列結合
+
+Java では + 演算子で文字列結合ができる
+
+```java
+// 例
+"ただいまの時刻は" + hour + "時" + minute + "分です。";
+```
+
+この実装が、バージョンアップで変わった
+([JEP 280: Indify String Concatenation](https://openjdk.org/jeps/280))
+
+* Java8 までのコンパイル結果
+  * StringBuilder で結合した文字列を作る
+* Java9 以降のコンパイル結果
+  * invokedynamic で実行時に処理を作る
+
+```java
+ Code:
+   stack=2, locals=2, args_size=2
+       0: iload_0
+       1: iload_1
+*      2: invokedynamic #38,  0
+*             // InvokeDynamic #0:makeConcatWithConstants:(II)Ljava/lang/String;
+       7: areturn
+```
+
+---
+
+# invokedynamic を使うメリット
+
+* **無駄のない処理**ができる
+  * 何度もバッファを作り直すようなことはしない
+  * 同等の処理を通常の API だけで実現するのは無理
+
+具体的に、以前の実装と比較してみよう！
+
+-
+比較対象のコード
+
+```java
+private static String makeText(int hour, int minute) {
+*    return "ただいまの時刻は" + hour + "時" + minute + "分です。";
+}
+```
+
+---
+
+# Java8 の場合
+
+* `StringBuilder` でつなげていって、最後に `.toString()` で `String` を生成
+
+```java
+Code:
+  stack=2, locals=2, args_size=2
+     0: new           #8    // class java/lang/StringBuilder
+     3: dup
+     4: invokespecial #9    // Method java/lang/StringBuilder."<init>":()V
+     7: ldc           #10   // String ただいまの時刻は
+     9: invokevirtual #11   // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    12: iload_0
+    13: invokevirtual #12   // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+    16: ldc           #13   // String 時
+    18: invokevirtual #11   // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    21: iload_1
+    22: invokevirtual #12   // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+    25: ldc           #14   // String 分です。
+    27: invokevirtual #11   // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    30: invokevirtual #15   // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+    33: areturn
+```
+
+---
+
+# 動きの詳細
+
+```java
+* new StringBuilder()
+```
+
+内部にバッファ（配列）を作る。
+
+```java
+  byte[] { □□□□□□□□□□□□□□□□ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+*    .append("ただいまの時刻は")
+```
+
+バッファに文字を入れる。
+
+```java
+          ただいまの時刻は  
+          ↓↓↓↓↓↓↓↓
+  byte[] { □□□□□□□□□□□□□□□□ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+     .append("ただいまの時刻は")
+*    .append(10)
+```
+
+バッファに文字を入れる。
+
+```java
+                           １０  
+                           ↓↓  
+  byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;□□□□□□□□ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+     .append("ただいまの時刻は")
+     .append(10)
+*    .append("時")
+```
+
+バッファに文字を入れる。
+
+```java
+                               時  
+                               ↓   
+  byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;□□□□□□ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+     .append("ただいまの時刻は")
+     .append(10)
+     .append("時")
+*    .append(30)
+```
+
+バッファに文字を入れる。
+
+```java
+                                ３０  
+                                ↓↓   
+ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;□□□□□ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+     .append("ただいまの時刻は")
+     .append(10)
+     .append("時")
+     .append(30)
+*    .append("分です。")
+```
+
+バッファに文字を入れ…、しかし**サイズが足りない！**
+
+```java
+                                    分です。  
+                                    ↓↓↓↓  
+ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;□□□・ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+     .append("ただいまの時刻は")
+     .append(10)
+     .append("時")
+     .append(30)
+     .append("分です。")
+```
+
+新しいバッファを作り、内容をコピーする。
+
+```java
+ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;□□□ }
+          ↓↓↓↓↓↓↓↓↓↓↓↓↓
+ byte[] { □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+     .append("ただいまの時刻は")
+     .append(10)
+     .append("時")
+     .append(30)
+     .append("分です。")
+```
+
+改めて、バッファに文字を入れる。
+
+```java
+                                    分です。  
+                                    ↓↓↓↓  
+ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;□□□□□□□□□□□□□□□□□□□ }
+```
+
+---
+
+# 動きの詳細
+
+```java
+ new StringBuilder()
+     .append("ただいまの時刻は")
+     .append(10)
+     .append("時")
+     .append(30)
+     .append("分です。")
+*    .toString()
+```
+
+バッファの中で文字が入っている部分を String にコピーする
+
+```java
+    byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE;□□□□□□□□□□□□□□□ }
+             ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+  new String(□□□□□□□□□□□□□□□□□)
+```
+
+---
+
+# Java8 までの処理まとめ
+
+* ちょっとずつバッファ（配列）に文字を足していく
+* バッファが足りなくなったら、新しく大きいバッファを作り直す
+* 最後に String を作る
+
+→ 処理中に何度もバッファを作っている  
+→ 無駄が多い
+
+---
+
+# Java9 以降の場合
+
+* Bootstrap メソッド(`StringConcatFactory.makeConcatWithConstants`)で作られたメソッドを呼び出す
+
+```java
+ Code:
+   stack=2, locals=2, args_size=2
+       0: iload_0
+       1: iload_1
+*      2: invokedynamic #38,  0
+*            // InvokeDynamic #0:makeConcatWithConstants:(II)Ljava/lang/String;
+       7: areturn
+
+ SourceFile: "StringConcat.java"
+ BootstrapMethods:
+   0: #50 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:
+      (
+        Ljava/lang/invoke/MethodHandles$Lookup;
+        Ljava/lang/String;
+        Ljava/lang/invoke/MethodType;
+        Ljava/lang/String;
+        [Ljava/lang/Object;
+      )Ljava/lang/invoke/CallSite;
+     Method arguments:
+*      #48 ただいまの時刻は\u0001時\u0001分です。
+```
+
+---
+
+# Bootstrap の処理
+
+* 引数で与えられた文字列をパースして、`\u0001` の部分にあとから文字列を当てはめるメソッドを作る
+
+出来上がったメソッド：
+
+```java
+String LambdaForm$MH/0x00007a15ef006000(int var0, int var1) {
+  // 長さの計算
+  long indexCoder = 9 + StringConcatHelper.UTF16;
+  indexCoder += StringConcatHelper.mix(indexCoder, var0);
+  indexCoder += StringConcatHelper.mix(indexCoder, var1);
+
+  // バッファ（配列）を作って文字列を詰める
+  byte[] buf = StringConcatHelper.newArray("分です。", indexCoder);
+  indexCoder = StringConcatHelper.prepend(indexCoder, buf, var1, "時");
+  indexCoder = StringConcatHelper.prepend(indexCoder, buf, var0, "ただいまの時刻は");
+
+  // String にする
+  return new String(buf);
+}
+```
+
+---
+
+# Bootstrap 後の処理
+
+* 出来上がったメソッドを呼び出すだけ
+
+```java
+private static String makeText(int hour, int minute) {
+*    return LambdaForm$MH/0x00007a15ef006000(hour, minute);
+}
+```
+
+hour = 10, minute = 30 と仮定して、このメソッドの処理を確認してみる。
+
+---
+
+# メソッドの処理
+
+最終的に何文字になるか計算  
+※ 定数の 9 は "ただいまの時刻は" と "時" の文字数の合計
+
+```java
+long indexCoder = 9 + StringConcatHelper.UTF16;
+indexCoder += StringConcatHelper.mix(indexCoder, var0); // var0 = 10 (2文字)
+indexCoder += StringConcatHelper.mix(indexCoder, var1); // var1 = 30 (2文字)
+```
+
+最終的に `indexCoder` は `13 + StringConcatHelper.UTF16` となる
+
+---
+
+# メソッドの処理
+
+```java
+byte[] buf = StringConcatHelper.newArray("分です。", indexCoder);
+```
+
+バッファ（配列）配列を作って、末尾の文字列を入れる。  
+
+このとき、**バッファの各要素の 0 初期化は行わない。**  
+（最終的にすべて上書きするので、初期化しなくても問題ない）
+
+
+```java
+                                     分です。
+                                     ↓↓↓↓
+  byte[] { ・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE; }
+```
+
+---
+
+# メソッドの処理
+
+```java
+indexCoder = StringConcatHelper.prepend(indexCoder, buf, var1, "時");
+```
+
+バッファの後ろから文字を入れる。  
+
+```java
+                               時３０
+                               ↓↓↓
+  byte[] { ・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE; }
+```
+
+---
+
+# メソッドの処理
+
+```java
+indexCoder = StringConcatHelper.prepend(indexCoder, buf, var0, "ただいまの時刻は");
+```
+
+バッファの後ろから文字を入れる。  
+
+```java
+           ただいまの時刻は１０
+           ↓↓↓↓↓↓↓↓↓↓
+  byte[] { ・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE; }
+```
+
+---
+
+# メソッドの処理
+
+```java
+return new String(buf);
+```
+
+String を作る。
+
+このとき、バッファはコピーせずにそのまま使う。
+
+```java
+  byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;３&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE; }
+           ↓
+  String(value, coder);
+```
+
+これで結合した文字列の完成！
+
+---
+
+# invokedynamic を使うメリット
+
+* **無駄のない処理**ができる
+  * 何度もバッファを作り直すようなことはしない
+  * 同等の処理を通常の API だけで実現するのは無理
+* 必要に応じて、処理が使い回せる
+  * 例えば、単純な文字列結合の場合、作成済みの処理が使われる
+* 実行環境にあった効率の良い処理になる
+  * 今後、JVM のバージョンを上げるだけで処理が改善されるかも
+
+* このようなメリットがあるので、invokedynamic を積極的に使うようになってきている
+  * Record クラス, パターンマッチング, リフレクションなど
+* 既存の処理も、今後置き換えが行われるかも
+  * 個人的には、Switch + Enum の分岐が置き換わると予想
+
+**新しい Java が登場した際は、javap して確認してみましょう！**
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
     </script>
