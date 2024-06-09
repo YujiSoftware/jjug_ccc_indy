@@ -240,6 +240,7 @@ final class Lambda$$Lambda implements Predicate {
 * 新たに**関数型インタフェースを実装したクラス**が作られる
   * 今回の場合は、`java.util.function.Predicate` を実装したクラス
   * このクラスの役割は、コンパイル時に作られたメソッドを呼ぶだけ
+* このクラスを作る処理は初回だけで、以降はスキップ
 <!-- 矢印を引いてわかりやすくする -->
 
 ```java
@@ -258,7 +259,23 @@ private static boolean lambda$isOdd$0(Integer v){
 }
 ```
 
-※ ラムダ外の変数を参照していないなら、毎回 new せず使いまわす
+※ 今回の場合、`Lambda$$Lambda` は毎回 `new` せず使いまわす
+
+---
+
+# ほかのパターン
+
+ラムダ式の内容によって、生成されるメソッドやクラスの構造が変わる
+
+* ラムダ内で**フィールド変数**を参照している
+  * `lambda$isOdd$0` が**インスタンスメソッド**になる
+    * 今回は、参照していないので static メソッドだった
+* ラムダ内で**ローカル変数**を参照している
+  * コンストラクタで変数をキャプチャするクラスが生成される
+  * ラムダを実行するごとに、クラスを毎回 `new` する
+
+ラムダを書いたときに、 javap したり `-Djdk.invoke.LambdaMetafactory.dumpProxyClassFiles` をつけて処理を確認してみよう！
+
 
 
     </textarea>
