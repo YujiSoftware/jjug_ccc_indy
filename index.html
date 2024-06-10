@@ -11,7 +11,6 @@
 
     body { 
       font-family: 'Noto Sans JP", sans-serif';
-      font-weight: 600;
     }
     .remark-code, .remark-inline-code {
       font-family: 'Ubuntu Mono';
@@ -21,26 +20,27 @@
     }
 
     .remark-slide-content {
-      font-size:30px; /* 20px */
-      padding: 0.5em 4em;
+      font-size: 40px; /* 20px */
+      padding: 0.5em 2em;
     }
     .remark-slide-content > * {
       margin: 0.25em 0;
     }
     .remark-slide-number {
-      margin: 0 0;
+      display: none; /* ページ番号 */
     }
     .remark-slide-content h1 {
-      font-size:65px; /* 55px */
+      font-size:60px; /* 55px */
     }
     .remark-slide-content h2 {
-      font-size:45px; /* 45px */
+      font-size:50px; /* 45px */
     }
     .remark-slide-content h3 {
-      font-size:35px; /* 35px */
+      font-size:40px; /* 35px */
     }
     .remark-code {
-      font-size:27px; /* 18px */
+      font-size:40px; /* 18px */
+      background-color: #EFEFEF;
     }
     
     .move {
@@ -78,6 +78,17 @@ class: center, middle
 
 ---
 
+# 日本語テスト（こころ・夏目漱石/著）
+
+* 私はその人を常に先生と呼んでいた。
+* だからここでもただ先生と書くだけで本名は打ち明けない。
+* これは世間を憚かる遠慮というよりも、その方が私にとって自然だからである。
+* 私はその人の記憶を呼び起すごとに、すぐ「先生」といいたくなる。
+* 筆を執っても心持は同じ事である。
+* よそよそしい頭文字などはとても使う気にならない。
+
+---
+
 # Transform
 
 Java のどこで InvokeDynamic が使われている？（Java22時点）
@@ -96,6 +107,7 @@ Java のどこで InvokeDynamic が使われている？（Java22時点）
 
 # Code
 
+ソースコードのサンプル
 ```java
 public boolean isOdd(java.util.List<java.lang.Integer>);
   0: aload_1
@@ -114,6 +126,7 @@ public boolean isOdd(java.util.List<java.lang.Integer>);
     <script type="text/javascript">
       var slideshow = remark.create({
         highlightLines: true,
+        highlightStyle: "googlecode",
         ratio: '16:9'
       });
     </script>
