@@ -7,13 +7,41 @@
     @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
     @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
     @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 
-    body { font-family: 'Droid Serif'; }
-    h1, h2, h3 {
-    font-family: 'Yanone Kaffeesatz';
-    font-weight: normal;
+    body { 
+      font-family: 'Noto Sans JP", sans-serif';
     }
-    .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    .remark-code, .remark-inline-code {
+      font-family: 'Ubuntu Mono';
+    }
+    .remark-inline-code { 
+      font-style: italic;
+    }
+
+    .remark-slide-content {
+      font-size: 40px; /* 20px */
+      padding: 0.5em 2em;
+    }
+    .remark-slide-content > * {
+      margin: 0.25em 0;
+    }
+    .remark-slide-number {
+      display: none; /* ページ番号 */
+    }
+    .remark-slide-content h1 {
+      font-size:60px; /* 55px */
+    }
+    .remark-slide-content h2 {
+      font-size:50px; /* 45px */
+    }
+    .remark-slide-content h3 {
+      font-size:40px; /* 35px */
+    }
+    .remark-code {
+      font-size:36px; /* 18px */
+      background-color: #EFEFEF;
+    }
     
     .move {
         animation: anim 0.5s ease-out;
@@ -158,6 +186,17 @@ public class Foo {
 
 ---
 
+# 日本語テスト（こころ・夏目漱石/著）
+
+* 私はその人を常に先生と呼んでいた。
+* だからここでもただ先生と書くだけで本名は打ち明けない。
+* これは世間を憚かる遠慮というよりも、その方が私にとって自然だからである。
+* 私はその人の記憶を呼び起すごとに、すぐ「先生」といいたくなる。
+* 筆を執っても心持は同じ事である。
+* よそよそしい頭文字などはとても使う気にならない。
+
+---
+
 # Transform
 
 Java のどこで InvokeDynamic が使われている？（Java22時点）
@@ -172,11 +211,32 @@ Java のどこで InvokeDynamic が使われている？（Java22時点）
   * toString, hashCode, equals メソッドの実装）
 ]
 
+---
+
+# Code
+
+ソースコードのサンプル
+```java
+public boolean isOdd(java.util.List<java.lang.Integer>);
+  0: aload_1
+  1: invokeinterface #7,  1
+            // InterfaceMethod java/util/List.stream:()Ljava/util/stream/Stream;
+* 6: invokedynamic #13,  0
+            // InvokeDynamic #0:test:()Ljava/util/function/Predicate;
+ 11: invokeinterface #17,  2
+            // InterfaceMethod java/util/stream/Stream.allMatch:(Ljava/util/function/Predicate;)Z
+ 16: ireturn
+```
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
     </script>
     <script type="text/javascript">
-      var slideshow = remark.create();
+      var slideshow = remark.create({
+        highlightLines: true,
+        highlightStyle: "googlecode",
+        ratio: '16:9'
+      });
     </script>
   </body>
 </html>
