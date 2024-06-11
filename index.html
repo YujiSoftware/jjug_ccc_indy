@@ -33,20 +33,128 @@
 
 class: center, middle
 
-# Title
+# InvokeDynamic, Under the Hood
+
+<!-- Agenda はあえて出さない -->
+
+---
+class: center, middle
+
+# javap <span style="font-size: 16pt;">してますか?</span>
 
 ---
 
-# Agenda
+# javap
 
-1. One
-2. Two
-3. Three
+- クラスファイル解析ツール
+ - クラスやメソッドの情報抽出
+ - バイトコード解析
+
+---
+
+たとえば...
+
+```Java
+public class Foo {
+  public static void main(String... args) {
+    System.out.println("ABC" + "DEF");
+  }
+}
+```
+
+コンパイルして、javapしてみると...
+
 --
 
-4. Four
-5. Five
-6. Six
+```
+> javac Foo.java
+
+> javap Foo
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+  public static void main(java.lang.String...);
+}
+```
+
+--
+
+- ソースに記述はないが、デフォルトコンストラクタが定義
+- 変数名、メソッド引数名はなくなってしまう
+
+---
+
+```
+> javap -c Foo
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+    Code:
+       0: aload_0
+       1: invokespecial #1   // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void main(java.lang.String...);
+    Code:
+       0: getstatic     #7  // Field java/lang/System.out:Ljava/io/PrintStream;
+       3: ldc           #13 // String ABCDEF
+       5: invokevirtual #15 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+       8: return
+}
+```
+
+<div style="text-align: right;">-c: バイトコードに逆アセンブル</div>
+	
+--
+
+- リテラル文字列の加算はコンパイル時に行われる
+- invokeで始まるバイトコードがメソッドコール
+
+
+---
+
+では、これでは
+
+```Java
+public class Foo {
+  public static void main(String... args) {
+    var x = "ABC";
+    var y = "DEF";
+    System.out.println(x + y);
+  }
+}
+```
+
+---
+
+```console
+> javap -c Foo
+Compiled from "Foo.java"
+public class Foo {
+  <<省略>>
+
+  public static void main(java.lang.String...);
+    Code:
+       0: ldc           #7                  // String ABC
+       2: astore_1
+       3: ldc           #7                  // String DEF
+       5: astore_2
+       6: getstatic     #9                  // Field java/lang/System.out:Ljava/io/PrintStream;
+       9: aload_1
+      10: aload_2
+      11: invokedynamic #15,  0             // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+      16: invokevirtual #19                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+      19: return
+}
+```
+
+--
+
+- メソッドコールをしていないのにinvokeで始まるバイトコードが
+
+--
+  
+<h2 style="text-align: center;">このinvokeDynamicが今日の主役</h2>
 
 ---
 
