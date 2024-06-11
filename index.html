@@ -61,14 +61,15 @@
 
 class: center, middle
 
-# InvokeDynamic, Under the Hood
+# InvokeDynamic,
+# Under the Hood
 
 <!-- Agenda はあえて出さない -->
 
 ---
 class: center, middle
 
-# javap <span style="font-size: 16pt;">してますか?</span>
+# javap <span style="font-size: 24pt;">してますか?</span>
 
 ---
 
@@ -79,8 +80,6 @@ class: center, middle
  - バイトコード解析
 
 ---
-
-たとえば...
 
 ```Java
 public class Foo {
@@ -94,7 +93,7 @@ public class Foo {
 
 --
 
-```
+```console
 > javac Foo.java
 
 > javap Foo
@@ -105,39 +104,68 @@ public class Foo {
 }
 ```
 
---
-
-- ソースに記述はないが、デフォルトコンストラクタが定義
-- 変数名、メソッド引数名はなくなってしまう
-
 ---
 
-```
-> javap -c Foo
+```console
+> javap -c Foo 
 Compiled from "Foo.java"
 public class Foo {
   public Foo();
     Code:
        0: aload_0
-       1: invokespecial #1   // Method java/lang/Object."<init>":()V
+       1: invokespecial #1  // Method "init":()V
        4: return
 
   public static void main(java.lang.String...);
     Code:
-       0: getstatic     #7  // Field java/lang/System.out:Ljava/io/PrintStream;
+       0: getstatic     #7  // Field System.out
        3: ldc           #13 // String ABCDEF
-       5: invokevirtual #15 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+       5: invokevirtual #15 // Method println:(LString;)V
        8: return
 }
 ```
 
-<div style="text-align: right;">-c: バイトコードに逆アセンブル</div>
-	
---
+---
 
-- リテラル文字列の加算はコンパイル時に行われる
-- invokeで始まるバイトコードがメソッドコール
+```console
+> javap -c Foo 
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+    Code:
+       0: aload_0
+       1: invokespecial #1  // Method "init":()V
+       4: return
 
+  public static void main(java.lang.String...);
+    Code:
+       0: getstatic     #7  // Field System.out
+*      3: ldc           #13 // String ABCDEF
+       5: invokevirtual #15 // Method println:(LString;)V
+       8: return
+}
+```
+
+---
+
+```console
+> javap -c Foo 
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+    Code:
+       0: aload_0
+*      1: invokespecial #1  // Method "init":()V
+       4: return
+
+  public static void main(java.lang.String...);
+    Code:
+       0: getstatic     #7  // Field System.out
+       3: ldc           #13 // String ABCDEF
+*      5: invokevirtual #15 // Method println:(LString;)V
+       8: return
+}
+```
 
 ---
 
@@ -157,32 +185,57 @@ public class Foo {
 
 ```console
 > javap -c Foo
-Compiled from "Foo.java"
-public class Foo {
-  <<省略>>
+  ...
 
   public static void main(java.lang.String...);
     Code:
-       0: ldc           #7                  // String ABC
+       0: ldc           #7  // String ABC
        2: astore_1
-       3: ldc           #7                  // String DEF
+       3: ldc           #7  // String DEF
        5: astore_2
-       6: getstatic     #9                  // Field java/lang/System.out:Ljava/io/PrintStream;
+       6: getstatic     #9  // Field System.out
        9: aload_1
       10: aload_2
-      11: invokedynamic #15,  0             // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-      16: invokevirtual #19                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+*     11: invokedynamic #15,  0
+      16: invokevirtual #19 // Method println:(LString;)V
       19: return
 }
 ```
 
+---
+
+class: center
+
+### &nbsp;
+### &nbsp;
+### メソッドコールをしていないのに
+### invokeで始まるバイトコード
+
 --
 
-- メソッドコールをしていないのにinvokeで始まるバイトコードが
+# 本日の主役: invokeDynamic
+
+---
+
+## invokeDynamic
+
+- JVMに追加された唯一のバイトコード
+  - Java 7で導入
 
 --
-  
-<h2 style="text-align: center;">このinvokeDynamicが今日の主役</h2>
+- メソッドコール用バイトコード
+  - invokeVirtual: インスタンスメソッド
+  - invokeStatic: クラスメソッド
+  - invokeInterface: インタフェース定義メソッド
+  - invokeSpecial: コンストラクタなど
+
+--
+  - **invokeDynamic: 動的ディスパッチメソッド**
+
+--
+
+<div style="text-align: center;">どういうこと?</div>
+
 
 ---
 
