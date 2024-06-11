@@ -38,6 +38,10 @@
     .remark-slide-content h3 {
       font-size:40px; /* 35px */
     }
+    .remark-slide-content .highlight {
+      color: darkred;
+      font-weight: bold;
+    }
     .remark-code {
       font-size:36px; /* 18px */
       background-color: #EFEFEF;
@@ -97,10 +101,12 @@ Java のどこで InvokeDynamic が使われている？（Java22時点）
 
 .move[
 * Lambda
-* String concat （+ 演算子による文字列結合）
 * Pattern Matching for switch
 * Recod class
-  * toString, hashCode, equals メソッドの実装）
+  * toString, hashCode, equals メソッドの実装
+* String Concatenation（Java 9〜） <!-- https://openjdk.org/jeps/280 -->
+  * +演算子による文字列結合
+* Refrection API（Java 18 〜）<!-- https://openjdk.org/jeps/416 -->
 ]
 
 ---
@@ -119,6 +125,69 @@ public boolean isOdd(java.util.List<java.lang.Integer>);
             // InterfaceMethod java/util/stream/Stream.allMatch:(Ljava/util/function/Predicate;)Z
  16: ireturn
 ```
+
+---
+
+class: center, middle
+
+# indy の動作
+
+---
+
+# バイトコードのメソッド呼び出し命令
+
+メソッド呼び出し(invoke)命令は5つある
+
+* invoke**interface**
+* invoke**virtual**
+* invoke**static**
+* invoke**special**
+* invoke**dynamic**
+
+<br>
+この違いは、**メソッドの解決方法**
+
+---
+
+# 命令ごとのメソッド解決の違い
+
+* invoke**interface**
+  * **JVMが** 実装クラスとその親クラスから探す
+* invoke**virtual**
+  * **JVMが** 指定されたクラスとその親クラスから探す
+* invoke**static**
+  * **JVMが** 指定されたクラスから static メソッドを探す
+* invoke**special**
+  * **JVMが** 指定されたクラスから探す
+
+---
+
+# invokedynamic (indy) の場合
+
+1. 登録された Java の **Bootstrap メソッド**を呼び出す
+2. 解決処理を行い **CallSite (実行メソッド)** を JVM に渡す
+3. JVM はその CallSite を実行する
+
+<br>
+Bootstrap メソッドを呼ぶのは最初の一回だけ  
+以降は、CallSite を使いまわす
+* オーバーヘッドがない  
+* インライン化など、JVM が処理を最適化できる
+
+---
+
+# Bootstrapメソッドでできること
+
+なんでもできる！
+
+* Lookup クラスを使って、既存のメソッドを探す
+* 複数のメソッドを合成する
+* 条件によって渡すメソッドを変える
+* その場でメソッドを作る
+* 引数に応じて CallSite をアップデートする
+* etc...
+
+---
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
