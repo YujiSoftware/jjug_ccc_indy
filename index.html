@@ -130,64 +130,139 @@ public boolean isOdd(java.util.List<java.lang.Integer>);
 
 class: center, middle
 
-# indy の動作
+# invokeDynamic の基本的な動作
 
 ---
 
-# バイトコードのメソッド呼び出し命令
+# メソッドコール用のバイトコード
 
-メソッド呼び出し(invoke)命令は5つある
-
-* invoke**interface**
 * invoke**virtual**
 * invoke**static**
-* invoke**special**
-* invoke**dynamic**
-
-<br>
-この違いは、**メソッドの解決方法**
-
----
-
-# 命令ごとのメソッド解決の違い
-
 * invoke**interface**
-  * **JVMが** 実装クラスとその親クラスから探す
-* invoke**virtual**
-  * **JVMが** 指定されたクラスとその親クラスから探す
-* invoke**static**
-  * **JVMが** 指定されたクラスから static メソッドを探す
 * invoke**special**
-  * **JVMが** 指定されたクラスから探す
-
----
-
-# invokedynamic (indy) の場合
-
-1. 登録された Java の **Bootstrap メソッド**を呼び出す
-2. 解決処理を行い **CallSite (実行メソッド)** を JVM に渡す
-3. JVM はその CallSite を実行する
+* invoke**dynamic** ← 🆕
 
 <br>
-Bootstrap メソッドを呼ぶのは最初の一回だけ  
-以降は、CallSite を使いまわす
-* オーバーヘッドがない  
-* インライン化など、JVM が処理を最適化できる
+何が違う？
 
 ---
 
-# Bootstrapメソッドでできること
+# invoke**virtual** の場合
 
-なんでもできる！
+指定された**クラスまたはその親クラス**から、  
+指定されたメソッドを探す
 
-* Lookup クラスを使って、既存のメソッドを探す
-* 複数のメソッドを合成する
-* 条件によって渡すメソッドを変える
-* その場でメソッドを作る
-* 引数に応じて CallSite をアップデートする
-* etc...
+<br>
+```java
+  foo.do(1, 2);
+    ↓
+  invokevirtual #10
+      // #10 Method Foo.do:(int, int)V
+```
 
 ---
+
+# invoke**static** の場合
+
+指定されたクラスから、  
+指定された定義の**static メソッド**を探す
+
+<br>
+```java
+  Foo.do(1, 2);
+    ↓
+  invokestatic #10
+      // #10 Method Foo.do:(int, int)V
+```
+
+---
+
+# invoke**interface** の場合
+
+指定されたインタフェースの**インスタンス**から、  
+指定された定義のメソッドを探す
+
+<br>
+```java
+  foo.do(1, 2);
+    ↓
+  invokeinterface #10
+      // #10 InterfaceMethod Foo.do:(int, int)V
+```
+
+---
+
+# invoke**special** の場合
+
+指定されたクラスから、  
+指定された定義のメソッドを探す  
+（コンストラクタや親クラスのメソッドなど）
+
+<br>
+```java
+  super.do(1, 2);
+    ↓
+  invokespecial #10
+      // #10 Method Foo.do:(int, int)V
+```
+
+---
+
+# invoke**dynamic** の場合
+
+--
+
+```java
+  foo.do(1, 2);
+    ↓
+  invokedynamic #10, 0
+      // InvokeDynamic #0:make:(Object, Object)V;
+
+BootstrapMethods:
+  0: #38 REF_invokeStatic FooFactory.make:(
+      Ljava/lang/invoke/MethodHandles$Lookup;
+      Ljava/lang/String;
+      Ljava/lang/invoke/MethodType;
+      Ljava/lang/String;
+    )Ljava/lang/invoke/CallSite;
+  Method arguments:
+    #36 do
+```
+
+---
+
+class: center, middle
+
+どういうこと？
+
+---
+
+# invoke**dynamic** の場合
+
+**指定した Bootstrap メソッド**が、  
+指定された定義のメソッドを探す
+
+<br>
+```java
+  foo.do(1, 2);
+    ↓
+  invokedynamic #10, 0
+      // InvokeDynamic #0:make:(Object, Object)V;
+           ↓
+BootstrapMethods:
+  0: #38 REF_invokeStatic FooFactory.make:
+```
+
+---
+
+# Bootstrap メソッドの役割
+
+<span style="text-decoration: underline">与えられた情報</span>をもとに、実行するメソッドを返す  
+<span style="margin-left: 3em">↓</span>
+* 引数の数と型
+* 戻り値の型
+* メソッド取得用のクラス
+* 追加情報（メソッド名など）
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
