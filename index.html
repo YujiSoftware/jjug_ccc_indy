@@ -61,20 +61,339 @@
 
 class: center, middle
 
-# Title
+# InvokeDynamic,
+# Under the Hood
+
+<!-- Agenda はあえて出さない -->
+
+---
+class: center, middle
+
+# javap <span style="font-size: 24pt;">してますか?</span>
 
 ---
 
-# Agenda
+# javap
 
-1. One
-2. Two
-3. Three
+- クラスファイル解析ツール
+ - クラスやメソッドの情報抽出
+ - バイトコード解析
+
+---
+
+```Java
+public class Foo {
+  public static void main(String... args) {
+    System.out.println("ABC" + "DEF");
+  }
+}
+```
+
+コンパイルして、javapしてみると...
+
 --
 
-4. Four
-5. Five
-6. Six
+```console
+> javac Foo.java
+
+> javap Foo
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+  public static void main(java.lang.String...);
+}
+```
+
+---
+
+```console
+> javap -c Foo           -c: 逆コンパイルオプション
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+    Code:
+       0: aload_0
+       1: invokespecial #1  // Method "init":()V
+       4: return
+
+  public static void main(java.lang.String...);
+    Code:
+       0: getstatic     #7  // Field System.out
+       3: ldc           #13 // String ABCDEF
+       5: invokevirtual #15 // Method println:(LString;)V
+       8: return
+}
+```
+
+---
+
+<span style="width: 50%; height: 200px; position: absolute; top: 65%; left: 50%; color: darkorange;">コンパイル時にリテラル連結</span>
+
+```console
+> javap -c Foo           -c: 逆コンパイルオプション 
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+    Code:
+       0: aload_0
+       1: invokespecial #1  // Method "init":()V
+       4: return
+
+  public static void main(java.lang.String...);
+    Code:
+       0: getstatic     #7  
+*      3: ldc           #13 // String ABCDEF
+       5: invokevirtual #15 // Method println:(LString;)V
+       8: return
+}
+```
+
+---
+
+<span style="width: 50%; height: 200px; position: absolute; top: 32%; left: 50%; color: darkorange;">invokeXXXでメソッドコール</span>
+
+```console
+> javap -c Foo           -c: 逆コンパイルオプション 
+Compiled from "Foo.java"
+public class Foo {
+  public Foo();
+    Code:
+       0: aload_0
+*      1: invokespecial #1  // Method "init":()V
+       4: return
+
+  public static void main(java.lang.String...);
+    Code:
+       0: getstatic     #7  // Field System.out
+       3: ldc           #13 // String ABCDEF
+*      5: invokevirtual #15 // Method println:(LString;)V
+       8: return
+}
+```
+
+---
+
+では、これでは
+
+```Java
+public class Foo {
+  public static void main(String... args) {
+    var x = "ABC";
+    var y = "DEF";
+    System.out.println(x + y);
+  }
+}
+```
+
+---
+
+```console
+> javap -c Foo
+  ...
+
+  public static void main(java.lang.String...);
+    Code:
+       0: ldc           #7  // String ABC
+       2: astore_1
+       3: ldc           #7  // String DEF
+       5: astore_2
+       6: getstatic     #9  // Field System.out
+       9: aload_1
+      10: aload_2
+*     11: invokedynamic #15,  0
+      16: invokevirtual #19 // Method println:(LString;)V
+      19: return
+}
+```
+
+---
+
+class: center
+
+### &nbsp;
+### &nbsp;
+### メソッドコールをしていないのに
+### invokeで始まるバイトコード???
+
+--
+
+# 本日の主役: invokeDynamic
+
+---
+
+## invokeDynamic
+
+- あとから追加された唯一のバイトコード (Java 7)
+
+--
+- メソッドコール用バイトコード
+  - invokeVirtual: インスタンスメソッド
+  - invokeStatic: クラスメソッド
+  - invokeInterface: インタフェース定義メソッド
+  - invokeSpecial: コンストラクタなど
+
+--
+  - **invokeDynamic: 動的メソッドディスパッチ**
+
+--
+
+<div style="font-size: 48px; font-weight: bold; text-align: center;">どういうこと?</div>
+
+---
+
+## 時はさかのぼって...
+
+- 2000年代初頭: JVM言語の興隆
+
+--
+
+<table style="border: none; width: 80%; margin-left: 20%; margin-right: 10%;">
+  <tr>
+    <td>JRuby</td>
+    <td>Jython</td>
+  </tr>
+  <tr>
+    <td>Scala</td>
+    <td>Rhino (JavaScript)</td>
+  </tr>
+  <tr>
+    <td>Groovy</td>
+    <td>et al.</td>
+  </tr>
+</table>
+
+--
+
+&nbsp;
+
+- 静的型付け言語だとバイトコードに割り当てやすい
+- 問題は動的型付けの言語
+
+---
+## 動的型付け言語におけるメソッドコール
+
+- 型が実行時にならないと決まらない
+  - コールするメソッドも実行時にならないと決まらない
+
+<table style="width: 90%; margin-left: 10%;">
+  <tr>
+    <td style="width: 35%;">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>x.do(a, b);</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+---
+## 動的型付け言語におけるメソッドコール
+
+- 型が実行時にならないと決まらない
+  - コールするメソッドも実行時にならないと決まらない
+
+<table style="width: 90%; margin-left: 10%;">
+  <tr>
+    <td style="width: 35%;">&nbsp;</td>
+    <td>Foo.do(int a, int b) {...}</td>
+  </tr>
+  <tr>
+    <td>x.do(a, b);</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="color: orange;">xはFoo? Bar?</td>
+    <td>Bar.do(String a, String b) {...}</td>
+  </tr>
+</table>
+
+--
+
+- 実行時にコールするメソッドを決定
+
+--
+<span style="width: 80px; height: 60px; position: absolute; top: 77%; left: 20%;"><image src="images/arrow.png" /></span>
+
+<span style="width: 500px; height: 60px; position: absolute; top: 77%; left: 30%;">動的メソッドディスパッチ</span>
+
+---
+
+## そこで動いたのが...
+
+--
+
+<table style="width: 90%; margin-left: 5%; border: none; text-align: center;">
+  <tr>
+    <td style="width: 40%;"><image style="width: 360px;" src="images/nutter.jpg" /></td>
+    <td style="width: 45%;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="width: 40%; font-size: 24pt;">JRuby作者 Charles Nutter</td>
+    <td style="width: 45%; font-size: 24pt;">&nbsp;</td>
+  </tr>
+</table>
+
+---
+
+## そこで動いたのが...
+
+<table style="width: 90%; margin-left: 5%; border: none; text-align: center;">
+  <tr>
+    <td style="width: 40%;"><image style="width: 360px;" src="images/nutter.jpg" /></td>
+    <td style="width: 45%;"><image style="width: 360px;" src="images/rose.jpg" /></td>
+  </tr>
+  <tr>
+    <td style="width: 40%; font-size: 24pt;">JRuby作者 Charles Nutter</td>
+    <td style="width: 45%; font-size: 24pt;">John Rose (Sun, 現Oracle)</td>
+  </tr>
+</table>
+
+---
+## Da Vince Machine Project
+
+- JVMをJava以外の言語にも拡張するプロジェクト
+  - 2007年に活動開始  
+
+--
+  - Project Lead: John Rose
+
+--
+
+&nbsp;<br />
+
+<table style="width: 90%; margin-left: 5%; margin-right: 5%; text-align: left; vertical-align: top;">
+  <tr>
+    <td colspan="2" style="width: 20%; vertical-align: top;">JSR 292: </td>
+    <td style="width: 80%;  vertical-align: top;">Supporting Dynamically Typed Languageon the Java Platform</td>
+  </tr>
+  <tr>
+    <td style="width: 10%">&nbsp;</td>
+    <td colspan="2">2011年 invokeDynamic 導入 (Java 7)</td>
+  </tr>
+</table>
+
+---
+
+## ちょっと脱線: JVM Language Summit
+
+- Da Vince Project主催のJVMに特化したカンファレンス
+  - 2008年から開催
+  - 当初は **JVM Language** のサミット
+  - 現在は **JVM** と **Language** のサミット
+
+---
+
+## ちょっと脱線: JVM Language Summit
+
+- Da Vince Project主催のJVMに特化したカンファレンス
+  - 2008年から開催
+  - 当初は **JVM Language** のサミット
+  - 現在は **JVM** と **Language** のサミット
+  - 2024年は 8月4日から3日間<br />Oracleサンタクララキャンパスで開催
 
 ---
 
