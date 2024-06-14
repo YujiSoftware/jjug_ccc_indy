@@ -1,0 +1,173 @@
+Classfile /home/yuji/repos/jjug_ccc_indy/src/Sample.class
+  Last modified 2024/06/15; size 1548 bytes
+  SHA-256 checksum 6fc2633cc9b86060626896598ef75ad3c8e3238b15f52221c7d78eb1d9d748dc
+  Compiled from "Sample.java"
+public class Sample
+  minor version: 0
+  major version: 66
+  flags: (0x0021) ACC_PUBLIC, ACC_SUPER
+  this_class: #26                         // Sample
+  super_class: #2                         // java/lang/Object
+  interfaces: 0, fields: 0, methods: 4, attributes: 3
+Constant pool:
+   #1 = Methodref          #2.#3          // java/lang/Object."<init>":()V
+   #2 = Class              #4             // java/lang/Object
+   #3 = NameAndType        #5:#6          // "<init>":()V
+   #4 = Utf8               java/lang/Object
+   #5 = Utf8               <init>
+   #6 = Utf8               ()V
+   #7 = Fieldref           #8.#9          // java/lang/System.out:Ljava/io/PrintStream;
+   #8 = Class              #10            // java/lang/System
+   #9 = NameAndType        #11:#12        // out:Ljava/io/PrintStream;
+  #10 = Utf8               java/lang/System
+  #11 = Utf8               out
+  #12 = Utf8               Ljava/io/PrintStream;
+  #13 = Methodref          #14.#15        // java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+  #14 = Class              #16            // java/lang/Integer
+  #15 = NameAndType        #17:#18        // valueOf:(I)Ljava/lang/Integer;
+  #16 = Utf8               java/lang/Integer
+  #17 = Utf8               valueOf
+  #18 = Utf8               (I)Ljava/lang/Integer;
+  #19 = InterfaceMethodref #20.#21        // java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+  #20 = Class              #22            // java/util/List
+  #21 = NameAndType        #23:#24        // of:(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+  #22 = Utf8               java/util/List
+  #23 = Utf8               of
+  #24 = Utf8               (Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+  #25 = Methodref          #26.#27        // Sample.isEven:(Ljava/util/List;)Z
+  #26 = Class              #28            // Sample
+  #27 = NameAndType        #29:#30        // isEven:(Ljava/util/List;)Z
+  #28 = Utf8               Sample
+  #29 = Utf8               isEven
+  #30 = Utf8               (Ljava/util/List;)Z
+  #31 = Methodref          #32.#33        // java/io/PrintStream.println:(Z)V
+  #32 = Class              #34            // java/io/PrintStream
+  #33 = NameAndType        #35:#36        // println:(Z)V
+  #34 = Utf8               java/io/PrintStream
+  #35 = Utf8               println
+  #36 = Utf8               (Z)V
+  #37 = InterfaceMethodref #20.#38        // java/util/List.stream:()Ljava/util/stream/Stream;
+  #38 = NameAndType        #39:#40        // stream:()Ljava/util/stream/Stream;
+  #39 = Utf8               stream
+  #40 = Utf8               ()Ljava/util/stream/Stream;
+  #41 = InvokeDynamic      #0:#42         // #0:test:()Ljava/util/function/Predicate;
+  #42 = NameAndType        #43:#44        // test:()Ljava/util/function/Predicate;
+  #43 = Utf8               test
+  #44 = Utf8               ()Ljava/util/function/Predicate;
+  #45 = InterfaceMethodref #46.#47        // java/util/stream/Stream.allMatch:(Ljava/util/function/Predicate;)Z
+  #46 = Class              #48            // java/util/stream/Stream
+  #47 = NameAndType        #49:#50        // allMatch:(Ljava/util/function/Predicate;)Z
+  #48 = Utf8               java/util/stream/Stream
+  #49 = Utf8               allMatch
+  #50 = Utf8               (Ljava/util/function/Predicate;)Z
+  #51 = Methodref          #14.#52        // java/lang/Integer.intValue:()I
+  #52 = NameAndType        #53:#54        // intValue:()I
+  #53 = Utf8               intValue
+  #54 = Utf8               ()I
+  #55 = Utf8               Code
+  #56 = Utf8               LineNumberTable
+  #57 = Utf8               main
+  #58 = Utf8               ([Ljava/lang/String;)V
+  #59 = Utf8               Signature
+  #60 = Utf8               (Ljava/util/List<Ljava/lang/Integer;>;)Z
+  #61 = Utf8               lambda$isEven$0
+  #62 = Utf8               (Ljava/lang/Integer;)Z
+  #63 = Utf8               StackMapTable
+  #64 = Utf8               SourceFile
+  #65 = Utf8               Sample.java
+  #66 = Utf8               BootstrapMethods
+  #67 = MethodType         #68            //  (Ljava/lang/Object;)Z
+  #68 = Utf8               (Ljava/lang/Object;)Z
+  #69 = MethodHandle       6:#70          // REF_invokeStatic Sample.lambda$isEven$0:(Ljava/lang/Integer;)Z
+  #70 = Methodref          #26.#71        // Sample.lambda$isEven$0:(Ljava/lang/Integer;)Z
+  #71 = NameAndType        #61:#62        // lambda$isEven$0:(Ljava/lang/Integer;)Z
+  #72 = MethodType         #62            //  (Ljava/lang/Integer;)Z
+  #73 = MethodHandle       6:#74          // REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #74 = Methodref          #75.#76        // java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #75 = Class              #77            // java/lang/invoke/LambdaMetafactory
+  #76 = NameAndType        #78:#79        // metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #77 = Utf8               java/lang/invoke/LambdaMetafactory
+  #78 = Utf8               metafactory
+  #79 = Utf8               (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #80 = Utf8               InnerClasses
+  #81 = Class              #82            // java/lang/invoke/MethodHandles$Lookup
+  #82 = Utf8               java/lang/invoke/MethodHandles$Lookup
+  #83 = Class              #84            // java/lang/invoke/MethodHandles
+  #84 = Utf8               java/lang/invoke/MethodHandles
+  #85 = Utf8               Lookup
+{
+  public Sample();
+    descriptor: ()V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 3: 0
+
+  public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: (0x0009) ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=4, locals=1, args_size=1
+         0: getstatic     #7                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         3: iconst_1
+         4: invokestatic  #13                 // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+         7: iconst_3
+         8: invokestatic  #13                 // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+        11: iconst_5
+        12: invokestatic  #13                 // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+        15: invokestatic  #19                 // InterfaceMethod java/util/List.of:(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;
+        18: invokestatic  #25                 // Method isEven:(Ljava/util/List;)Z
+        21: invokevirtual #31                 // Method java/io/PrintStream.println:(Z)V
+        24: return
+      LineNumberTable:
+        line 6: 0
+        line 7: 24
+
+  public static boolean isEven(java.util.List<java.lang.Integer>);
+    descriptor: (Ljava/util/List;)Z
+    flags: (0x0009) ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: aload_0
+         1: invokeinterface #37,  1           // InterfaceMethod java/util/List.stream:()Ljava/util/stream/Stream;
+         6: invokedynamic #41,  0             // InvokeDynamic #0:test:()Ljava/util/function/Predicate;
+        11: invokeinterface #45,  2           // InterfaceMethod java/util/stream/Stream.allMatch:(Ljava/util/function/Predicate;)Z
+        16: ireturn
+      LineNumberTable:
+        line 16: 0
+    Signature: #60                          // (Ljava/util/List<Ljava/lang/Integer;>;)Z
+
+  private static boolean lambda$isEven$0(java.lang.Integer);
+    descriptor: (Ljava/lang/Integer;)Z
+    flags: (0x100a) ACC_PRIVATE, ACC_STATIC, ACC_SYNTHETIC
+    Code:
+      stack=2, locals=1, args_size=1
+         0: aload_0
+         1: invokevirtual #51                 // Method java/lang/Integer.intValue:()I
+         4: iconst_2
+         5: irem
+         6: ifne          13
+         9: iconst_1
+        10: goto          14
+        13: iconst_0
+        14: ireturn
+      LineNumberTable:
+        line 16: 0
+      StackMapTable: number_of_entries = 2
+        frame_type = 13 /* same */
+        frame_type = 64 /* same_locals_1_stack_item */
+          stack = [ int ]
+}
+SourceFile: "Sample.java"
+BootstrapMethods:
+  0: #73 REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #67 (Ljava/lang/Object;)Z
+      #69 REF_invokeStatic Sample.lambda$isEven$0:(Ljava/lang/Integer;)Z
+      #72 (Ljava/lang/Integer;)Z
+InnerClasses:
+  public static final #85= #81 of #83;    // Lookup=class java/lang/invoke/MethodHandles$Lookup of class java/lang/invoke/MethodHandles

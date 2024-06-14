@@ -42,6 +42,10 @@
       font-size:36px; /* 18px */
       background-color: #EFEFEF;
     }
+
+    .underline {
+      text-decoration: underline;
+    }
     
     .move {
         animation: anim 0.5s ease-out;
@@ -109,7 +113,7 @@ public class Foo {
 ```console
 > javap -c Foo           -c: 逆コンパイルオプション
 Compiled from "Foo.java"
-public class Foo {
+public class Foo {はし
   public Foo();
     Code:
        0: aload_0
@@ -225,7 +229,7 @@ class: center
 
 - あとから追加された唯一のバイトコード (Java 7)
 
---
+--はし
 - メソッドコール用バイトコード
   - invokeVirtual: インスタンスメソッド
   - invokeStatic: クラスメソッド
@@ -442,198 +446,222 @@ public boolean isOdd(java.util.List<java.lang.Integer>);
 ---
 class: center, middle
 
-# ラムダ式と invokedynamic
+# ラムダ式と invokeDynamic
 
 ---
 
-# ラムダ式と invokedynamic
+# ラムダ式と invokeDynamic
 
-<!-- [内部動作に迫る：Javaのラムダ式は実際にはどのようにして動いているのか](https://blogs.oracle.com/otnjp/post/behind-the-scenes-how-do-lambda-expressions-really-work-in-java-ja) -->
+* ラムダ式とは
+  * 小さな処理を簡単に書けるようにしたもの
+  * 実体は、関数型インタフェースの実装クラス
 
-* ラムダ式は、invokedynamic を使って呼び出される
-* この動きを追ってみましょう！
+&nbsp;  
+これと invokeDynamic になんの関係が…？
+
+---
+
+# ラムダ式と invokeDynamic
+
+* ラムダ式とは
+  * 小さな処理を簡単に書けるようにしたもの
+  * 実体は、<span class="underline">関数型インタフェースの実装クラス</span>
+  
+<span style="margin-left: 12em;">↑</span>  
+<span style="margin-left: 3em;">**これを用意するのに invokeDynamic を使っている**</span>  
+
+---
+
+class: center, middle
+
+実際に確認してみましょう！
+
+---
 
 ## 検証に使用するコード
 
-リストの中身がすべて奇数かどうか判定するメソッド
-```java
-public boolean isOdd(List<Integer> values) {
-*    return values.stream().allMatch(v -> v % 2 == 1);
-}
-```
+* Sample クラス
+  * isEven メソッド
+      * リストの中身がすべて偶数か判定するメソッド
 
-Note: `allMatch` のシグネチャ
 ```java
-boolean allMatch(Predicate<? super T> predicate)
+public class Sample {
+  public boolean isEven(List<Integer> values) {
+      return values.stream()
+*                  .allMatch(v -> v % 2 == 0);
+  }
+}
 ```
 
 ---
 
-# コンパイル結果
+# 確認手順
 
-`javac` でコンパイルして、`javap` でリバースアセンブルする  
-（private メソッドも対象にするため、`-p` をつける）
+1. `javac` でコンパイル
+2. `javap` でリバースアセンブルする   
+（バイトコードを出力するため、`-c` をつける）
 
-```sh
-javac Lambda.java
-javap -p Lambda.class
+&nbsp;  
+
 ```
-
---
-
-## javap の結果
-```java
-public boolean isOdd(java.util.List<java.lang.Integer>);
-*private static boolean lambda$isOdd$0(java.lang.Integer);
+javac Sample.java
+javap -c Sample.class
 ```
-
-* コンパイルにより、`lambda$isOdd$0` というメソッドができあがる
-  * ラムダ式の中身がメソッドになっている
-* この2つのメソッドの関係は？
-
-<!--
-* static メソッドになる場合
-  * ラムダ内で完結している
-  * ラムダ内でローカル変数を使用している
-* インスタンスメソッドになる場合
-  * ラムダ内でフィールド変数を使用している
-  * ラムダ内でクラスのインスタンスメソッドを呼んでいる
--->
 
 ---
 
-# isOdd のバイトコード
+# javap の結果 (isEven メソッド)
 
 ```java
-public boolean isOdd(List<Integer> values) {
-*    return values.stream().allMatch(v -> v % 2 == 1);
-}
-```
-
-↓
-
-```java
- public boolean isOdd(java.util.List<java.lang.Integer>);
+ public boolean isEven(List<Integer>);
     0: aload_1
     1: invokeinterface #7,  1
-              // InterfaceMethod java/util/List.stream:()Ljava/util/stream/Stream;
+          // InterfaceMethod List.stream:()L/Stream;
 *   6: invokedynamic #13,  0
-              // InvokeDynamic #0:test:()Ljava/util/function/Predicate;
+*         // InvokeDynamic #0:test:()L/Predicate;
    11: invokeinterface #17,  2
-              // InterfaceMethod java/util/stream/Stream.allMatch:(Ljava/util/function/Predicate;)Z
+          // InterfaceMethod Stream.allMatch:(L/Predicate;)Z
    16: ireturn
 ```
 
-* `isOdd` には `lambda$isOdd$0` を呼び出している箇所がない
-* invokedynamic によって呼び出す処理が作られている？
+invokeDynamic が使われている！  
+この Bootstrap は？
 
 ---
 
-# Boostrap に渡す内容
+# javap の結果 (Bootstrap)
 
 ```java
- BootstrapMethods:
-   0: #49 REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:
-       (
-         Ljava/lang/invoke/MethodHandles$Lookup;
-         Ljava/lang/String;
-         Ljava/lang/invoke/MethodType;
-         Ljava/lang/invoke/MethodType;
-         Ljava/lang/invoke/MethodHandle;
-         Ljava/lang/invoke/MethodType;
-       )Ljava/lang/invoke/CallSite;
+*BootstrapMethods:
+  0: #49 REF_invokeStatic 
+*     java/lang/invoke/LambdaMetafactory.metafactory:
+      ( L/MethodHandles$Lookup;
+        L/String;
+        L/MethodType;
+        L/MethodType;
+        L/MethodHandle;
+        L/MethodType;
+      )L/CallSite;
      Method arguments:
-       #43 (Ljava/lang/Object;)Z
-*      #45 REF_invokeStatic Lambda.lambda$isOdd$0:(Ljava/lang/Integer;)Z
-       #48 (Ljava/lang/Integer;)Z
+       #43 (L/Object;)Z
+       #45 REF_invokeStatic Lambda.lambda$isEven$0:(L/Integer;)Z
+       #48 (L/Integer;)Z
 ```
-
-* `REF_invokeStatic lambda$isOdd$0` を Boostrap に渡している
-* これを Bootstrap ではどう扱っている？
 
 ---
 
 # Bootstrap の処理
 
-* `InnerClassLambdaMetafactory` で**インナークラスを生成している**
+```java
+public final class LambdaMetafactory {
+  public static CallSite metafactory(MethodHandles.Lookup caller,省略) throws LambdaConversionException {
+    AbstractValidatingLambdaMetafactory mf;
+*   mf = new InnerClassLambdaMetafactory(Objects.requireNonNull(caller),省略);
+    mf.validateMetafactoryArgs();
+*   return mf.buildCallSite();
+ }
+```
+
+(インナー)**クラスを生成する**ファクトリークラスが、  
+**CallSite を生成**している
+
+---
+
+# ここまでのまとめ
+
+1. ラムダ式の処理は invokeDynamic を使っている
+2. この invokeDynamic の Bootstrap メソッドでは、  
+**クラスを生成している**
+3. 生成したクラスを、CallSite としている
+
+---
+
+class: center, middle
+
+## クラスの中身、気になります！
+
+---
+
+# Bootstrap の成果物
+
+* この Bootstrap には、**生成したクラスの出力機能**がある
+
+&nbsp;  
+システムプロパティを指定して実行する  
+<span class="underline">-Djdk.invoke.LambdaMetafactory.dumpProxyClassFiles</span>  
+→ DUMP_LAMBDA_PROXY_CLASS_FILES という  
+　 ディレクトリにクラスファイルができる
+
+&nbsp;  
+<div style="text-align: center;">これで Bootstrap の成果物がわかる！</div>
+
+---
+
+# 成果物（Sample$$Lambda クラス）
+
+クラスファイルを逆コンパイルした結果
 
 ```java
- public static CallSite metafactory(MethodHandles.Lookup caller,
-                                     String interfaceMethodName,
-                                     MethodType factoryType,
-                                     MethodType interfaceMethodType,
-                                     MethodHandle implementation,
-                                     MethodType dynamicMethodType)
-         throws LambdaConversionException {
-     AbstractValidatingLambdaMetafactory mf;
-*    mf = new InnerClassLambdaMetafactory(Objects.requireNonNull(caller),
-                                           Objects.requireNonNull(factoryType),
-                                           Objects.requireNonNull(interfaceMethodName),
-                                           Objects.requireNonNull(interfaceMethodType),
-                                           Objects.requireNonNull(implementation),
-                                           Objects.requireNonNull(dynamicMethodType),
-                                           false,
-                                           EMPTY_CLASS_ARRAY,
-                                           EMPTY_MT_ARRAY);
-     mf.validateMetafactoryArgs();
-     return mf.buildCallSite();
+final class Sample$$Lambda implements Predicate {
+   public boolean test(Object var1) {
+      return Sample.lambda$isEven$0((Integer)var1);
+   }
+}
+
+```
+
+&nbsp;  
+<span class="underline">lambda$isEven$0</span> を呼び出している  
+&nbsp; → なにこれ？
+
+---
+
+# 謎のメソッドの正体
+
+改めて、検証用の Sample.class を javap してみる  
+（全部のメソッド一覧を出力するため、`-p` をつける）
+
+```
+javap -p Sample
+```
+
+--
+
+&nbsp;  
+### 結果 → あった！
+```java
+ public class Sample {
+   public static boolean isEven(List<Integer>);
+*  private static boolean lambda$isEven$0(Integer);
  }
 ```
 
 ---
 
-# 生成されたクラスの内容
+# lambda$isEven$0 メソッドの正体
 
-* `java.lang.invoke.LambdaMetafactory` には、**生成したクラスを出力してくれる機能**がある
-  * 実行時に `-Djdk.invoke.LambdaMetafactory.dumpProxyClassFiles` を指定
-* これを使えば、簡単に結果がわかる
 
---
-
-出力されたクラスファイルを逆コンパイルした結果：
+メソッドを逆コンパイルした結果
+<!-- javap してバイトコードを示すべきかもしれませんが、説明が長くなるので諦めました -->
 
 ```java
-import java.util.function.Predicate;
-
-final class Lambda$$Lambda implements Predicate {
-   private Lambda$$Lambda() {
-   }
-
-   public boolean test(Object var1) {
-      return Lambda.lambda$isOdd$0((Integer)var1);
-   }
+private static boolean lambda$isEven$0(Integer v) {
+  return v % 2 == 0
 }
 ```
 
----
-
-# Bootstrap 解決後のコード
-
-* 新たに**関数型インタフェースを実装したクラス**が作られる
-  * 今回の場合は、`java.util.function.Predicate` を実装したクラス
-  * このクラスの役割は、コンパイル時に作られたメソッドを呼ぶだけ
-* このクラスを作る処理は初回だけで、以降はスキップ
-<!-- 矢印を引いてわかりやすくする -->
-
-```java
-public boolean isOdd(List<Integer> values) {
-    return values.stream().allMatch(Lambda$$Lambda().instance);
-}
-
-final class Lambda$$Lambda implements Predicate {            
-  public boolean test(Object var1) {
-      return Lambda.lambda$isOdd$0((Integer)var1);
-  }
-}
-
-private static boolean lambda$isOdd$0(Integer v){
-  return v % 2 ==0;
-}
-```
-
-※ 今回の場合、`Lambda$$Lambda` は毎回 `new` せず使いまわす
+&nbsp;  
+→ ラムダ式の中身が private メソッドになっている
 
 ---
+
+# 最終的な処理の流れ
+
+TODO: Sample クラスと Sample$$Lambda クラスの図
+
+---
+
+exclude: true
 
 # ほかのパターン
 
