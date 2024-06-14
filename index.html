@@ -46,14 +46,6 @@
       font-size:36px; /* 18px */
       background-color: #EFEFEF;
     }
-
-    table.border,
-    table.border th,
-    table.border td {
-      padding: 0 0.2em;
-      border: 3px solid #444;
-      border-collapse: collapse;
-    }
     
     .move {
         animation: anim 0.5s ease-out;
@@ -138,236 +130,49 @@ public boolean isOdd(java.util.List<java.lang.Integer>);
 
 class: center, middle
 
-# invoke 命令の基本的な動作
-
----
-
-# メソッドコール用のバイトコード
-
-* invoke**virtual**
-* invoke**static**
-* invoke**interface**
-* invoke**special**
-* invoke**dynamic** ← 🆕
-
-何が違う？  
-なんで追加した？
-
----
-
-# invoke**virtual** の場合
-
-指定された**クラスまたはその親クラス**にある  
-メソッドを探して実行
-
-<br>
-```java
-  foo.do(1, 2);
-    ↓
-  invokevirtual #10
-      // #10 Method Foo.do:(int, int)V
-```
-
----
-
-# invoke**static** の場合
-
-指定されたクラスにある    
-**static メソッド**を探して実行
-
-<br>
-```java
-  Foo.do(1, 2);
-    ↓
-  invokestatic #10
-      // #10 Method Foo.do:(int, int)V
-```
-
----
-
-# invoke**interface** の場合
-
-指定されたインタフェースの**インスタンス**にある  
-メソッドを探して実行
-
-<br>
-```java
-  foo.do(1, 2);
-    ↓
-  invokeinterface #10
-      // #10 InterfaceMethod Foo.do:(int, int)V
-```
-
----
-
-# invoke**special** の場合
-
-指定されたクラスにある  
-メソッドを探して実行  
-（コンストラクタや親クラスのメソッドなど）
-
-<br>
-```java
-  super.do(1, 2);
-    ↓
-  invokespecial #10
-      // #10 Method Foo.do:(int, int)V
-```
+# invokeDynamic の動作
 
 ---
 
 class: center, middle
 
-invoke**virtual**  
-invoke**static**  
-invoke**interface**  
-invoke**special**  
-&nbsp; 
-
-## これだけでいいのでは？
+# <span style="text-decoration: underline;">invoke</span>  
+↓   
+メソッドを**実行**する  
 
 ---
 
-# invokedynamic を使う場面
+class: center, middle
 
-* invokevirtual / interface / static / special では  
-対応できないとき
 
-&nbsp;
-<table style="width: 90%; margin-left: 10%;">
-  <tr>
-    <td style="width: 35%;">&nbsp;</td>
-    <td>Foo.do(int a, int b) {...}</td>
-  </tr>
-  <tr>
-    <td>x.do(a, b);</td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr>
-    <td style="color: orange;">xはFoo? Bar?</td>
-    <td>Bar.do(String a, String b) {...}</td>
-  </tr>
-</table>
+# <span style="text-decoration: underline;">dynamic</span>  
+↓   
+**動的に**
 
 ---
 
-# 既存の invoke 命令の制限
+# invokeDynamic とは
 
-指定されたクラスやインタフェースから探して実行  
-→ **指定しなくてはいけない**
-
-&nbsp;  
-実行時のオブジェクトによって、  
-**Foo クラス or  Bar クラスのメソッド**  
-を実行ということができない
-
-&nbsp;  
-でも、このようなことは動的型付け言語では必須！
-
----
-
-# 簡単な解決方法
-
-中間処理を作る
-
-```java
-public static void do(Object r, int x, int y) {
-  if (r instanceof Foo) {
-    Foo.do(x, y)
-  } else if (r instanceof Bar) {
-    Bar.do(x, y)
-  }
-}
-```
-
-→ これでも問題がある
-
----
-
-# 問題点
-
-1. 普通のメソッド呼び出しに比べて遅い
-2. 動的に変更できない
-
-```java
-public static void do(Object r, int x, int y) {
-  if (r instanceof Foo) {
-    Foo.do(x, y)
-  } else if (r instanceof Bar) {
-    Bar.do(x, y)
-  } else {
-    // 別のクラスの do が呼ばれた場合は？
-  }
-}
-```
-
----
-
-# 新しい invoke 命令に求められること
-
-1. **任意のメソッド**を実行できる
-2. 十分に**速い**
-3. 動的に**処理を変更できる**
+対象のメソッドを<span style="text-decoration: underline;">動的に決定して</span>、実行する
 
 --
 
-&nbsp;   
-<div style="color: darkred; font-size: 70px; text-align: center;">それが invokedynamic ！</div>
+<span style="margin-left: 10.5em;">↓</span>   
+<span style="margin-left: 8em;">いつ決定する？</span>  
+<span style="margin-left: 8em;">どうやって決定する？</span>
 
 ---
 
-# invokedynamic の特徴 (1)
+<!-- # 処理の流れ -->
 
-&nbsp;  
-.center.middle[
-**<span style="text-decoration: underline;">任意のメソッド</span>**を実行  
-]
+Bootstrapメソッド<span style="margin-left: 1.4em;">…</span> 実行するメソッドを決定する処理  
+Lookupクラス<span style="margin-left: 3.5em;">…</span> メソッドを検索するオブジェクト  
+CallSiteクラス<span style="margin-left: 3.5em;">…</span> 実行対象のMethodHandleを保持  
+MethodHandleクラス … メソッドの参照  
+<img src="images/bootstrap.jpg" style="width: 90%; margin: 1em;">
 
----
 
-# invokedynamic の特徴 (1)
 
-&nbsp;  
-.center[
-**<span style="text-decoration: underline;">任意のメソッド</span>**を実行  
-↓  
-実行するメソッドを決めるためのメソッドを用意する
-（**Bootstrap メソッド**）
-]
-
----
-
-# Bootstrap メソッドの役割
-
-<span style="text-decoration: underline">与えられた情報</span>をもとに、<span style="text-decoration: underline">実行情報(CallSite)</span>を返す  
-<span style="margin-left: 3em">↓</span>
-* 引数の数と型情報
-* 戻り値の型情報
-* メソッド検索(Lookup)クラス
-* 追加情報 <!-- recipe-->
-
-&nbsp;  
-どうやって実行情報を用意する？
-
----
-
-# invokedynamic の特徴 (2)
-
-十分に**速い**  
-&nbsp;  
-## 理由
-
-一回目の実行時は、  
-Bootstrap メソッドから実行情報を取得   
-<span style="margin-left: 4em">↓</span>  
-二回目以降は、実行情報が更新されていなければ   
-メソッドを実行するだけ （= invokevirtual と同じ）
-
----
-
-# invokedynamic の特徴 (3)
-
-動的に**処理を変更できる**
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
