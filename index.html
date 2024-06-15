@@ -139,7 +139,7 @@ public class Foo {
 
 ---
 
-<span style="width: 50%; height: 200px; position: absolute; top: 65%; left: 50%; color: darkorange;">コンパイル時にリテラル連結</span>
+<span style="width: 50%; height: 200px; position: absolute; top: 65%; left: 50%; color: #ec7e31;">コンパイル時にリテラル連結</span>
 
 ```console
 > javap -c Foo           -c: 逆コンパイルオプション 
@@ -162,7 +162,7 @@ public class Foo {
 
 ---
 
-<span style="width: 50%; height: 200px; position: absolute; top: 32%; left: 50%; color: darkorange;">invokeXXXでメソッドコール</span>
+<span style="width: 50%; height: 200px; position: absolute; top: 32%; left: 50%; color: #ec7e31;">invokeXXXでメソッドコール</span>
 
 ```console
 > javap -c Foo           -c: 逆コンパイルオプション 
@@ -318,7 +318,7 @@ class: center
     <td>&nbsp;</td>
   </tr>
   <tr>
-    <td style="color: orange;">xはFoo? Bar?</td>
+    <td style="color: #ec7e31;">xはFoo? Bar?</td>
     <td>Bar.do(String a, String b) {...}</td>
   </tr>
 </table>
@@ -367,7 +367,9 @@ class: center
 ---
 ## Da Vince Machine Project
 
-- JVMをJava以外の言語にも拡張するプロジェクト
+<image style="position: absolute; width: 306px; top: 0%; left: 75%;" src="images/DukeHeliRuby.png" />
+
+- JVMをJava以外の言語にも広げることを目的
   - 2007年に活動開始  
 
 --
@@ -390,12 +392,39 @@ class: center
 
 ---
 
+background-image: url(images/oracleauditorium2.jpg)
+
 ## ちょっと脱線: JVM Language Summit
 
 - Da Vince Project主催のJVMに特化したカンファレンス
   - 2008年から開催
   - 当初は **JVM Language** のサミット
   - 現在は **JVM** と **Language** のサミット
+
+---
+
+background-image: url(images/oracleauditorium2.jpg)
+
+## ちょっと脱線: JVM Language Summit
+
+- Da Vince Project主催のJVMに特化したカンファレンス
+  - 2008年から開催
+  - 当初は **JVM Language** のサミット
+  - 現在は **JVM** と **Language** のサミット
+  - 2024年は 8月4日から3日間<br />Oracleサンタクララキャンパスで開催
+
+---
+
+<image style="position: absolute; width: 100%; height: 100%; top: 0px; left: 0px;" src="images/oracleauditorium.jpg" />
+
+---
+
+<image style="position: absolute; width: 100%; height: 100%; top: 0px; left: 0px;" src="images/jvmls1.jpg" />
+
+---
+
+<image style="position: absolute; width: 100%; height: 100%; top: 0px; left: 0px;" src="images/jvmls2.jpg" />
+
 
 ---
 
