@@ -525,7 +525,7 @@ javap -c Sample.class
 ```
 
 invokeDynamic が使われている！  
-この Bootstrap は？
+→ Bootstrap メソッドは？
 
 ---
 
@@ -570,7 +570,7 @@ public final class LambdaMetafactory {
 # ここまでのまとめ
 
 1. ラムダ式の処理は invokeDynamic を使っている
-2. この invokeDynamic の Bootstrap メソッドでは、  
+2. invokeDynamic の Bootstrap メソッドでは、  
 **クラスを生成している**
 3. 生成したクラスを、CallSite としている
 
@@ -584,15 +584,13 @@ class: center, middle
 
 # Bootstrap の成果物
 
-* この Bootstrap には、**生成したクラスの出力機能**がある
+* ラムダの Bootstrap メソッドで使用している `InnerClassLambdaMetafactory` クラスには、**生成したクラスの出力機能**がある
 
-&nbsp;  
 システムプロパティを指定して実行する  
 <span class="underline">-Djdk.invoke.LambdaMetafactory.dumpProxyClassFiles</span>  
 → DUMP_LAMBDA_PROXY_CLASS_FILES という  
 　 ディレクトリにクラスファイルができる
 
-&nbsp;  
 <div style="text-align: center;">これで Bootstrap の成果物がわかる！</div>
 
 ---
