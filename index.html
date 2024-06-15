@@ -466,13 +466,47 @@ class: center, middle
 
 ---
 
-# 処理の流れ
+# invokeDynamic の処理の流れ
 
 **Bootstrapメソッド** … 実行するメソッドを決定する処理  
 **Lookupクラス**<span style="margin-left: 2.3em;">…</span> メソッドを検索するためのクラス  
 **CallSiteクラス**<span style="margin-left: 2.3em;">…</span> 実行対象のMethodHandleを保持  
 **MethodHandleクラス** … メソッドの参照
 <img src="images/bootstrap.jpg" style="width: 90%; margin: 0.5em 1em;">
+
+---
+
+# invokeDynamic のポイント
+
+初回のメソッド実行前に **Bootstarap を実行し**、  
+**<span class="underline">任意の処理</span>**をして CallSite を返す  
+
+--
+<span style="margin-left: 2em;">↓</span>  
+動的メソッド検索以外のことをしても構わない  
+
+--
+<span style="margin-left: 2em;">↓</span>   
+Bootstrap で**メソッドを作って返す**こともできる  
+
+--
+<span style="margin-left: 2em;">↓</span>  
+**Java でも使いたい！**
+
+<!-- コンパイル時にやっていたことを、実行時に行える -->
+---
+
+# Java と invokeDynamic 
+
+Java のいろいろなところで  
+invokeDynamic が使われている！
+
+* ラムダ式
+* 文字列結合
+* レコードクラス
+* switch 式/文のパターン・マッチング
+
+（Java 22 時点）
 
 ---
 class: center, middle
@@ -1255,12 +1289,12 @@ String を作る
 # invokeDynamic の可能性
 
 * invokeDynamic を使えば実行時に処理を差し込める
-  * Java でも需要がある
+  * コンパイル時にやるようなことを実行時に行える
   * 最適な処理を生成しやすい
 
 &nbsp;  
-さらに、まだ Java で使っていない機能も持っている
-* CallSite の更新
+さらに、まだ Java で使っていない機能もある
+* CallSite の MethodHandle の更新
   * Java でも動的ディスパッチしたい場合がでてきたら使うかも！？
 
 ---
@@ -1275,7 +1309,7 @@ String を作る
 * 結果、効率の良い処理が実現された
 
 &nbsp;  
-今後もさらに使われるようになるかもしれません
+**今後もさらに使われるようになるかも！**
 
 ---
 
