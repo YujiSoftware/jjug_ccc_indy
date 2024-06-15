@@ -520,7 +520,7 @@ class: center, middle
 * ラムダ式とは
   * 関数を簡単に書けるようにしたもの
   * 実体は、  
-  関数型インタフェースの実装クラスを new したもの
+  関数型インタフェースの実装クラスを new すること
 
 &nbsp;  
 これと invokeDynamic になんの関係が…？
@@ -532,7 +532,7 @@ class: center, middle
 * ラムダ式とは
   * 関数を簡単に書けるようにしたもの
   * 実体は、  
-  <span class="underline">関数型インタフェースの実装クラスを new したもの</span>
+  <span class="underline">関数型インタフェースの実装クラスを new すること</span>
 
 <span style="margin-left: 12em;">↑</span>  
 <span style="margin-left: 2em;">**これを用意するのに invokeDynamic を使っている**</span>
@@ -588,7 +588,6 @@ javap -verbose Sample.class
 * メソッド
   * 定義
   * **バイトコード**
-  * デバッグ情報(あれば)
 * 属性
   * **invokeDynamic で呼び出す Bootstrap メソッド**
   * レコードクラスの定義&nbsp;&nbsp;&nbsp; etc...
@@ -613,7 +612,7 @@ javap -verbose Sample.class
 ```
 
 invokeDynamic が使われている！  
-→ Bootstrap メソッドは？
+&nbsp;&nbsp;&nbsp;&nbsp;→ Bootstrap メソッドは？
 
 ---
 
@@ -661,10 +660,10 @@ public final class LambdaMetafactory {
 **直接バイトコードを組み立てて**クラスを作っている
 
 ```java
-MethodVisitor ctor = 
+MethodVisitor ctor =   
     cw.visitMethod(ACC_PRIVATE, NAME_CTOR,
       constructorType.toMethodDescriptorString(),
-      null, null);  // メソッド定義
+      null, null);  // メソッド定義 
 ctor.visitCode();   // コードブロック開始
 ctor.visitVarInsn(ALOAD, 0);  // 値のロード
 ctor.visitMethodInsn(
@@ -712,7 +711,7 @@ class: center, middle
 
 # Bootstrap の成果物
 
-* ラムダの Bootstrap メソッドで使用している `InnerClassLambdaMetafactory` クラスには、**生成したクラスの出力機能**がある
+* ラムダの Bootstrap メソッドで使用している<br />`InnerClassLambdaMetafactory` クラスには<br />**生成したクラスの出力機能**がある
 
 ---
 
@@ -741,9 +740,8 @@ final class Sample$$Lambda implements Predicate {
 
 ```
 
-&nbsp;  
 <span class="underline">lambda$isEven$0</span> を呼び出している  
-&nbsp; → なにこれ？
+&nbsp;&nbsp;&nbsp; → なにこれ？
 
 ---
 
@@ -858,11 +856,11 @@ Java 8 と Java 9 でコンパイル → javap してみる
 # Java 8 の javap 結果
 
 ```console
- 0: new           #5    / class StringBuilder
+ 0: new           #5   // class StringBuilder
  3: dup
- 4: invokespecial #6    / Method StringBuilder."<init>":()V
- 7: ldc           #7    / String Total:
- 9: invokevirtual #8    / Method StringBuilder.append:(LString;)LStringBuilder;
+ 4: invokespecial #6   // Method StringBuilder."<init>":()V
+ 7: ldc           #7   // String Total:
+ 9: invokevirtual #8   // Method StringBuilder.append:(LString;)LStringBuilder;
 12: iload_0
 13: invokevirtual #9   // Method StringBuilder.append:(I)LStringBuilder;
 16: ldc           #10  // String files
@@ -1303,13 +1301,20 @@ String を作る
 
 * もともと invokeDynamic は JVM で動的型付け言語を  
 効率的に処理するために実装された  
-* 現在は、Java でも使っている
+* 現在は、Java でも使われている
   * Lambda の実装
   * 文字列結合の処理生成  など
-* 結果、効率の良い処理が実現された
 
-&nbsp;  
-**今後もさらに使われるようになるかも！**
+---
+
+# まとめ
+
+* もともと invokeDynamic は JVM で動的型付け言語を  
+効率的に処理するために実装された  
+* 現在は、Java でも使われている
+  * Lambda の実装
+  * 文字列結合の処理生成  など
+* 今後はさらに使われるようになるかも！
 
 ---
 
