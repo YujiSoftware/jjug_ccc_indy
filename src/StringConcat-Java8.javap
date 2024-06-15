@@ -1,75 +1,60 @@
 Classfile /home/yuji/repos/jjug_ccc_indy/src/StringConcat.class
-  Last modified 2024/06/09; size 919 bytes
-  MD5 checksum 4830b55a56ae64ad35ad1f581aa6ce17
+  Last modified 2024/06/15; size 738 bytes
+  MD5 checksum e776d2c8f52acb11b4a67157af74c5a3
   Compiled from "StringConcat.java"
 public class StringConcat
   minor version: 0
   major version: 52
   flags: ACC_PUBLIC, ACC_SUPER
 Constant pool:
-   #1 = Methodref          #17.#28        // java/lang/Object."<init>":()V
-   #2 = Methodref          #29.#30        // java/time/LocalDateTime.now:()Ljava/time/LocalDateTime;
-   #3 = Methodref          #29.#31        // java/time/LocalDateTime.getHour:()I
-   #4 = Methodref          #29.#32        // java/time/LocalDateTime.getMinute:()I
-   #5 = Methodref          #16.#33        // StringConcat.makeText:(II)Ljava/lang/String;
-   #6 = Fieldref           #34.#35        // java/lang/System.out:Ljava/io/PrintStream;
-   #7 = Methodref          #36.#37        // java/io/PrintStream.println:(Ljava/lang/String;)V
-   #8 = Class              #38            // java/lang/StringBuilder
-   #9 = Methodref          #8.#28         // java/lang/StringBuilder."<init>":()V
-  #10 = String             #39            // ただいまの時刻は
-  #11 = Methodref          #8.#40         // java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
-  #12 = Methodref          #8.#41         // java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
-  #13 = String             #42            // 時
-  #14 = String             #43            // 分です。
-  #15 = Methodref          #8.#44         // java/lang/StringBuilder.toString:()Ljava/lang/String;
-  #16 = Class              #45            // StringConcat
-  #17 = Class              #46            // java/lang/Object
-  #18 = Utf8               <init>
-  #19 = Utf8               ()V
-  #20 = Utf8               Code
-  #21 = Utf8               LineNumberTable
-  #22 = Utf8               main
-  #23 = Utf8               ([Ljava/lang/String;)V
-  #24 = Utf8               makeText
-  #25 = Utf8               (II)Ljava/lang/String;
-  #26 = Utf8               SourceFile
-  #27 = Utf8               StringConcat.java
-  #28 = NameAndType        #18:#19        // "<init>":()V
-  #29 = Class              #47            // java/time/LocalDateTime
-  #30 = NameAndType        #48:#49        // now:()Ljava/time/LocalDateTime;
-  #31 = NameAndType        #50:#51        // getHour:()I
-  #32 = NameAndType        #52:#51        // getMinute:()I
-  #33 = NameAndType        #24:#25        // makeText:(II)Ljava/lang/String;
-  #34 = Class              #53            // java/lang/System
-  #35 = NameAndType        #54:#55        // out:Ljava/io/PrintStream;
-  #36 = Class              #56            // java/io/PrintStream
-  #37 = NameAndType        #57:#58        // println:(Ljava/lang/String;)V
-  #38 = Utf8               java/lang/StringBuilder
-  #39 = Utf8               ただいまの時刻は
-  #40 = NameAndType        #59:#60        // append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
-  #41 = NameAndType        #59:#61        // append:(I)Ljava/lang/StringBuilder;
-  #42 = Utf8               時
-  #43 = Utf8               分です。
-  #44 = NameAndType        #62:#63        // toString:()Ljava/lang/String;
-  #45 = Utf8               StringConcat
-  #46 = Utf8               java/lang/Object
-  #47 = Utf8               java/time/LocalDateTime
-  #48 = Utf8               now
-  #49 = Utf8               ()Ljava/time/LocalDateTime;
-  #50 = Utf8               getHour
-  #51 = Utf8               ()I
-  #52 = Utf8               getMinute
-  #53 = Utf8               java/lang/System
-  #54 = Utf8               out
-  #55 = Utf8               Ljava/io/PrintStream;
-  #56 = Utf8               java/io/PrintStream
-  #57 = Utf8               println
-  #58 = Utf8               (Ljava/lang/String;)V
-  #59 = Utf8               append
-  #60 = Utf8               (Ljava/lang/String;)Ljava/lang/StringBuilder;
-  #61 = Utf8               (I)Ljava/lang/StringBuilder;
-  #62 = Utf8               toString
-  #63 = Utf8               ()Ljava/lang/String;
+   #1 = Methodref          #13.#24        // java/lang/Object."<init>":()V
+   #2 = Methodref          #12.#25        // StringConcat.makeText:(I)Ljava/lang/String;
+   #3 = Fieldref           #26.#27        // java/lang/System.out:Ljava/io/PrintStream;
+   #4 = Methodref          #28.#29        // java/io/PrintStream.println:(Ljava/lang/String;)V
+   #5 = Class              #30            // java/lang/StringBuilder
+   #6 = Methodref          #5.#24         // java/lang/StringBuilder."<init>":()V
+   #7 = String             #31            // Total:
+   #8 = Methodref          #5.#32         // java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+   #9 = Methodref          #5.#33         // java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+  #10 = String             #34            // files
+  #11 = Methodref          #5.#35         // java/lang/StringBuilder.toString:()Ljava/lang/String;
+  #12 = Class              #36            // StringConcat
+  #13 = Class              #37            // java/lang/Object
+  #14 = Utf8               <init>
+  #15 = Utf8               ()V
+  #16 = Utf8               Code
+  #17 = Utf8               LineNumberTable
+  #18 = Utf8               main
+  #19 = Utf8               ([Ljava/lang/String;)V
+  #20 = Utf8               makeText
+  #21 = Utf8               (I)Ljava/lang/String;
+  #22 = Utf8               SourceFile
+  #23 = Utf8               StringConcat.java
+  #24 = NameAndType        #14:#15        // "<init>":()V
+  #25 = NameAndType        #20:#21        // makeText:(I)Ljava/lang/String;
+  #26 = Class              #38            // java/lang/System
+  #27 = NameAndType        #39:#40        // out:Ljava/io/PrintStream;
+  #28 = Class              #41            // java/io/PrintStream
+  #29 = NameAndType        #42:#43        // println:(Ljava/lang/String;)V
+  #30 = Utf8               java/lang/StringBuilder
+  #31 = Utf8               Total:
+  #32 = NameAndType        #44:#45        // append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+  #33 = NameAndType        #44:#46        // append:(I)Ljava/lang/StringBuilder;
+  #34 = Utf8               files
+  #35 = NameAndType        #47:#48        // toString:()Ljava/lang/String;
+  #36 = Utf8               StringConcat
+  #37 = Utf8               java/lang/Object
+  #38 = Utf8               java/lang/System
+  #39 = Utf8               out
+  #40 = Utf8               Ljava/io/PrintStream;
+  #41 = Utf8               java/io/PrintStream
+  #42 = Utf8               println
+  #43 = Utf8               (Ljava/lang/String;)V
+  #44 = Utf8               append
+  #45 = Utf8               (Ljava/lang/String;)Ljava/lang/StringBuilder;
+  #46 = Utf8               (I)Ljava/lang/StringBuilder;
+  #47 = Utf8               toString
+  #48 = Utf8               ()Ljava/lang/String;
 {
   public StringConcat();
     descriptor: ()V
@@ -80,52 +65,42 @@ Constant pool:
          1: invokespecial #1                  // Method java/lang/Object."<init>":()V
          4: return
       LineNumberTable:
-        line 3: 0
+        line 1: 0
 
   public static void main(java.lang.String[]);
     descriptor: ([Ljava/lang/String;)V
     flags: ACC_PUBLIC, ACC_STATIC
     Code:
-      stack=2, locals=3, args_size=1
-         0: invokestatic  #2                  // Method java/time/LocalDateTime.now:()Ljava/time/LocalDateTime;
-         3: astore_1
-         4: aload_1
-         5: invokevirtual #3                  // Method java/time/LocalDateTime.getHour:()I
-         8: aload_1
-         9: invokevirtual #4                  // Method java/time/LocalDateTime.getMinute:()I
-        12: invokestatic  #5                  // Method makeText:(II)Ljava/lang/String;
-        15: astore_2
-        16: getstatic     #6                  // Field java/lang/System.out:Ljava/io/PrintStream;
-        19: aload_2
-        20: invokevirtual #7                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-        23: return
+      stack=2, locals=2, args_size=1
+         0: bipush        123
+         2: invokestatic  #2                  // Method makeText:(I)Ljava/lang/String;
+         5: astore_1
+         6: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         9: aload_1
+        10: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        13: return
       LineNumberTable:
-        line 5: 0
-        line 6: 4
-        line 7: 16
-        line 8: 23
+        line 3: 0
+        line 4: 6
+        line 5: 13
 
-  private static java.lang.String makeText(int, int);
-    descriptor: (II)Ljava/lang/String;
+  private static java.lang.String makeText(int);
+    descriptor: (I)Ljava/lang/String;
     flags: ACC_PRIVATE, ACC_STATIC
     Code:
-      stack=2, locals=2, args_size=2
-         0: new           #8                  // class java/lang/StringBuilder
+      stack=2, locals=1, args_size=1
+         0: new           #5                  // class java/lang/StringBuilder
          3: dup
-         4: invokespecial #9                  // Method java/lang/StringBuilder."<init>":()V
-         7: ldc           #10                 // String ただいまの時刻は
-         9: invokevirtual #11                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+         4: invokespecial #6                  // Method java/lang/StringBuilder."<init>":()V
+         7: ldc           #7                  // String Total:
+         9: invokevirtual #8                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
         12: iload_0
-        13: invokevirtual #12                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
-        16: ldc           #13                 // String 時
-        18: invokevirtual #11                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
-        21: iload_1
-        22: invokevirtual #12                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
-        25: ldc           #14                 // String 分です。
-        27: invokevirtual #11                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
-        30: invokevirtual #15                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
-        33: areturn
+        13: invokevirtual #9                  // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        16: ldc           #10                 // String files
+        18: invokevirtual #8                  // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        21: invokevirtual #11                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+        24: areturn
       LineNumberTable:
-        line 11: 0
+        line 8: 0
 }
 SourceFile: "StringConcat.java"

@@ -1,76 +1,63 @@
 Classfile /home/yuji/repos/jjug_ccc_indy/src/StringConcat.class
-  Last modified 2024/06/09; size 1096 bytes
-  SHA-256 checksum ceb8a094df2ae685c884d314f5c27d6b9c6ff2e6ba01d9d2068ac9ccbc8eb697
+  Last modified 2024/06/15; size 928 bytes
+  MD5 checksum ed9e802a34a76af7f3eb19baf65787bd
   Compiled from "StringConcat.java"
 public class StringConcat
   minor version: 0
-  major version: 65
+  major version: 53
   flags: (0x0021) ACC_PUBLIC, ACC_SUPER
-  this_class: #21                         // StringConcat
-  super_class: #2                         // java/lang/Object
+  this_class: #6                          // StringConcat
+  super_class: #7                         // java/lang/Object
   interfaces: 0, fields: 0, methods: 3, attributes: 3
 Constant pool:
-   #1 = Methodref          #2.#3          // java/lang/Object."<init>":()V
-   #2 = Class              #4             // java/lang/Object
-   #3 = NameAndType        #5:#6          // "<init>":()V
-   #4 = Utf8               java/lang/Object
-   #5 = Utf8               <init>
-   #6 = Utf8               ()V
-   #7 = Methodref          #8.#9          // java/time/LocalDateTime.now:()Ljava/time/LocalDateTime;
-   #8 = Class              #10            // java/time/LocalDateTime
-   #9 = NameAndType        #11:#12        // now:()Ljava/time/LocalDateTime;
-  #10 = Utf8               java/time/LocalDateTime
-  #11 = Utf8               now
-  #12 = Utf8               ()Ljava/time/LocalDateTime;
-  #13 = Methodref          #8.#14         // java/time/LocalDateTime.getHour:()I
-  #14 = NameAndType        #15:#16        // getHour:()I
-  #15 = Utf8               getHour
-  #16 = Utf8               ()I
-  #17 = Methodref          #8.#18         // java/time/LocalDateTime.getMinute:()I
-  #18 = NameAndType        #19:#16        // getMinute:()I
-  #19 = Utf8               getMinute
-  #20 = Methodref          #21.#22        // StringConcat.makeText:(II)Ljava/lang/String;
-  #21 = Class              #23            // StringConcat
-  #22 = NameAndType        #24:#25        // makeText:(II)Ljava/lang/String;
-  #23 = Utf8               StringConcat
-  #24 = Utf8               makeText
-  #25 = Utf8               (II)Ljava/lang/String;
-  #26 = Fieldref           #27.#28        // java/lang/System.out:Ljava/io/PrintStream;
-  #27 = Class              #29            // java/lang/System
-  #28 = NameAndType        #30:#31        // out:Ljava/io/PrintStream;
-  #29 = Utf8               java/lang/System
-  #30 = Utf8               out
-  #31 = Utf8               Ljava/io/PrintStream;
-  #32 = Methodref          #33.#34        // java/io/PrintStream.println:(Ljava/lang/String;)V
-  #33 = Class              #35            // java/io/PrintStream
-  #34 = NameAndType        #36:#37        // println:(Ljava/lang/String;)V
-  #35 = Utf8               java/io/PrintStream
-  #36 = Utf8               println
-  #37 = Utf8               (Ljava/lang/String;)V
-  #38 = InvokeDynamic      #0:#39         // #0:makeConcatWithConstants:(II)Ljava/lang/String;
-  #39 = NameAndType        #40:#25        // makeConcatWithConstants:(II)Ljava/lang/String;
-  #40 = Utf8               makeConcatWithConstants
-  #41 = Utf8               Code
-  #42 = Utf8               LineNumberTable
-  #43 = Utf8               main
-  #44 = Utf8               ([Ljava/lang/String;)V
-  #45 = Utf8               SourceFile
-  #46 = Utf8               StringConcat.java
-  #47 = Utf8               BootstrapMethods
-  #48 = String             #49            // ただいまの時刻は\u0001時\u0001分です。
-  #49 = Utf8               ただいまの時刻は\u0001時\u0001分です。
-  #50 = MethodHandle       6:#51          // REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
-  #51 = Methodref          #52.#53        // java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
-  #52 = Class              #54            // java/lang/invoke/StringConcatFactory
-  #53 = NameAndType        #40:#55        // makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
-  #54 = Utf8               java/lang/invoke/StringConcatFactory
-  #55 = Utf8               (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
-  #56 = Utf8               InnerClasses
-  #57 = Class              #58            // java/lang/invoke/MethodHandles$Lookup
-  #58 = Utf8               java/lang/invoke/MethodHandles$Lookup
-  #59 = Class              #60            // java/lang/invoke/MethodHandles
-  #60 = Utf8               java/lang/invoke/MethodHandles
-  #61 = Utf8               Lookup
+   #1 = Methodref          #7.#18         // java/lang/Object."<init>":()V
+   #2 = Methodref          #6.#19         // StringConcat.makeText:(I)Ljava/lang/String;
+   #3 = Fieldref           #20.#21        // java/lang/System.out:Ljava/io/PrintStream;
+   #4 = Methodref          #22.#23        // java/io/PrintStream.println:(Ljava/lang/String;)V
+   #5 = InvokeDynamic      #0:#27         // #0:makeConcatWithConstants:(I)Ljava/lang/String;
+   #6 = Class              #28            // StringConcat
+   #7 = Class              #29            // java/lang/Object
+   #8 = Utf8               <init>
+   #9 = Utf8               ()V
+  #10 = Utf8               Code
+  #11 = Utf8               LineNumberTable
+  #12 = Utf8               main
+  #13 = Utf8               ([Ljava/lang/String;)V
+  #14 = Utf8               makeText
+  #15 = Utf8               (I)Ljava/lang/String;
+  #16 = Utf8               SourceFile
+  #17 = Utf8               StringConcat.java
+  #18 = NameAndType        #8:#9          // "<init>":()V
+  #19 = NameAndType        #14:#15        // makeText:(I)Ljava/lang/String;
+  #20 = Class              #30            // java/lang/System
+  #21 = NameAndType        #31:#32        // out:Ljava/io/PrintStream;
+  #22 = Class              #33            // java/io/PrintStream
+  #23 = NameAndType        #34:#35        // println:(Ljava/lang/String;)V
+  #24 = Utf8               BootstrapMethods
+  #25 = MethodHandle       6:#36          // REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #26 = String             #37            // Total:\u0001files
+  #27 = NameAndType        #38:#15        // makeConcatWithConstants:(I)Ljava/lang/String;
+  #28 = Utf8               StringConcat
+  #29 = Utf8               java/lang/Object
+  #30 = Utf8               java/lang/System
+  #31 = Utf8               out
+  #32 = Utf8               Ljava/io/PrintStream;
+  #33 = Utf8               java/io/PrintStream
+  #34 = Utf8               println
+  #35 = Utf8               (Ljava/lang/String;)V
+  #36 = Methodref          #39.#40        // java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #37 = Utf8               Total:\u0001files
+  #38 = Utf8               makeConcatWithConstants
+  #39 = Class              #41            // java/lang/invoke/StringConcatFactory
+  #40 = NameAndType        #38:#45        // makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #41 = Utf8               java/lang/invoke/StringConcatFactory
+  #42 = Class              #47            // java/lang/invoke/MethodHandles$Lookup
+  #43 = Utf8               Lookup
+  #44 = Utf8               InnerClasses
+  #45 = Utf8               (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #46 = Class              #48            // java/lang/invoke/MethodHandles
+  #47 = Utf8               java/lang/invoke/MethodHandles$Lookup
+  #48 = Utf8               java/lang/invoke/MethodHandles
 {
   public StringConcat();
     descriptor: ()V
@@ -81,47 +68,40 @@ Constant pool:
          1: invokespecial #1                  // Method java/lang/Object."<init>":()V
          4: return
       LineNumberTable:
-        line 3: 0
+        line 1: 0
 
   public static void main(java.lang.String[]);
     descriptor: ([Ljava/lang/String;)V
     flags: (0x0009) ACC_PUBLIC, ACC_STATIC
     Code:
-      stack=2, locals=3, args_size=1
-         0: invokestatic  #7                  // Method java/time/LocalDateTime.now:()Ljava/time/LocalDateTime;
-         3: astore_1
-         4: aload_1
-         5: invokevirtual #13                 // Method java/time/LocalDateTime.getHour:()I
-         8: aload_1
-         9: invokevirtual #17                 // Method java/time/LocalDateTime.getMinute:()I
-        12: invokestatic  #20                 // Method makeText:(II)Ljava/lang/String;
-        15: astore_2
-        16: getstatic     #26                 // Field java/lang/System.out:Ljava/io/PrintStream;
-        19: aload_2
-        20: invokevirtual #32                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-        23: return
+      stack=2, locals=2, args_size=1
+         0: bipush        123
+         2: invokestatic  #2                  // Method makeText:(I)Ljava/lang/String;
+         5: astore_1
+         6: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         9: aload_1
+        10: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        13: return
       LineNumberTable:
-        line 5: 0
-        line 6: 4
-        line 7: 16
-        line 8: 23
+        line 3: 0
+        line 4: 6
+        line 5: 13
 
-  private static java.lang.String makeText(int, int);
-    descriptor: (II)Ljava/lang/String;
+  private static java.lang.String makeText(int);
+    descriptor: (I)Ljava/lang/String;
     flags: (0x000a) ACC_PRIVATE, ACC_STATIC
     Code:
-      stack=2, locals=2, args_size=2
+      stack=1, locals=1, args_size=1
          0: iload_0
-         1: iload_1
-         2: invokedynamic #38,  0             // InvokeDynamic #0:makeConcatWithConstants:(II)Ljava/lang/String;
-         7: areturn
+         1: invokedynamic #5,  0              // InvokeDynamic #0:makeConcatWithConstants:(I)Ljava/lang/String;
+         6: areturn
       LineNumberTable:
-        line 11: 0
+        line 8: 0
 }
 SourceFile: "StringConcat.java"
-BootstrapMethods:
-  0: #50 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
-    Method arguments:
-      #48 ただいまの時刻は\u0001時\u0001分です。
 InnerClasses:
-  public static final #61= #57 of #59;    // Lookup=class java/lang/invoke/MethodHandles$Lookup of class java/lang/invoke/MethodHandles
+  public static final #43= #42 of #46;    // Lookup=class java/lang/invoke/MethodHandles$Lookup of class java/lang/invoke/MethodHandles
+BootstrapMethods:
+  0: #25 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #26 Total:\u0001files

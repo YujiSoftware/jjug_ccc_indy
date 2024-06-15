@@ -462,18 +462,17 @@ class: center, middle
 --
 
 <span style="margin-left: 10.5em;">↓</span>   
-<span style="margin-left: 8em;">いつ決定する？</span>  
-<span style="margin-left: 8em;">どうやって決定する？</span>
+<span style="margin-left: 6.5em;">どうやって決定する？</span>
 
 ---
 
-<!-- # 処理の流れ -->
+# 処理の流れ
 
 **Bootstrapメソッド** … 実行するメソッドを決定する処理  
 **Lookupクラス**<span style="margin-left: 2.3em;">…</span> メソッドを検索するためのクラス  
 **CallSiteクラス**<span style="margin-left: 2.3em;">…</span> 実行対象のMethodHandleを保持  
-**MethodHandleクラス** … メソッドの参照  
-<img src="images/bootstrap.jpg" style="width: 90%; margin: 1em;">
+**MethodHandleクラス** … メソッドの参照
+<img src="images/bootstrap.jpg" style="width: 90%; margin: 0.5em 1em;">
 
 ---
 class: center, middle
@@ -485,8 +484,9 @@ class: center, middle
 # ラムダ式と invokeDynamic
 
 * ラムダ式とは
-  * 小さな処理を簡単に書けるようにしたもの
-  * 実体は、関数型インタフェースの実装クラス
+  * 関数を簡単に書けるようにしたもの
+  * 実体は、  
+  関数型インタフェースの実装クラスを new したもの
 
 &nbsp;  
 これと invokeDynamic になんの関係が…？
@@ -496,9 +496,9 @@ class: center, middle
 # ラムダ式と invokeDynamic
 
 * ラムダ式とは
-  * 小さな処理を簡単に書けるようにしたもの
-  * 実体は、<span class="underline">関数型</span>  
-  <span class="underline">インタフェースを実装したクラスのインスタンス</span>
+  * 関数を簡単に書けるようにしたもの
+  * 実体は、  
+  <span class="underline">関数型インタフェースの実装クラスを new したもの</span>
 
 <span style="margin-left: 12em;">↑</span>  
 <span style="margin-left: 2em;">**これを用意するのに invokeDynamic を使っている**</span>
@@ -507,7 +507,7 @@ class: center, middle
 
 class: center, middle
 
-実際に確認してみましょう！
+## 実際に確認してみましょう！
 
 ---
 
@@ -616,7 +616,7 @@ public final class LambdaMetafactory {
  }
 ```
 
-(インナー)**クラスを生成する**ファクトリークラスが、  
+**インナークラスを生成する**ファクトリークラスが、  
 **CallSite を生成**している
 
 ---
@@ -630,30 +630,31 @@ public final class LambdaMetafactory {
 MethodVisitor ctor = 
     cw.visitMethod(ACC_PRIVATE, NAME_CTOR,
       constructorType.toMethodDescriptorString(),
-      null, null);
-ctor.visitCode();
-ctor.visitVarInsn(ALOAD, 0);
+      null, null);  // メソッド定義
+ctor.visitCode();   // コードブロック開始
+ctor.visitVarInsn(ALOAD, 0);  // 値のロード
 ctor.visitMethodInsn(
     INVOKESPECIAL, JAVA_LANG_OBJECT, NAME_CTOR,
-    METHOD_DESCRIPTOR_VOID, false);
+    METHOD_DESCRIPTOR_VOID, false); // メソッド呼び出し
 ```
 
 ---
 
 # buildCallSite() の処理
 
-生成したクラスのインスタンス生成メソッドを CallSite として返す
+生成したクラスのインスタンス生成メソッドを  
+CallSite として返す
 
 ```java
 if (factoryType.parameterCount() == 0) {
-    // In the case of a non-capturing lambda, we 
-*   // optimize linkage by pre-computing a single instance
-    Object inst = mh.asType(methodType(Object.class))
-      .invokeExact();
-    return new ConstantCallSite(
-      MethodHandles.constant(interfaceClass, inst));
+* // In the case of a non-capturing lambda, we 
+* // optimize linkage by pre-computing a single instance
+  Object inst = mh.asType(methodType(Object.class))
+    .invokeExact();
+  return new ConstantCallSite(
+    MethodHandles.constant(interfaceClass, inst));
 } else {
-    return new ConstantCallSite(mh.asType(factoryType));
+  return new ConstantCallSite(mh.asType(factoryType));
 }
 ```
 
@@ -686,7 +687,7 @@ class: center, middle
 * システムプロパティを指定して実行する  
 <span class="underline" style="font-size: 36px;">-Djdk.invoke.LambdaMetafactory.dumpProxyClassFiles</span>  
 * DUMP_LAMBDA_PROXY_CLASS_FILES という  
-ディレクトリにクラスファイルができる
+フォルダにクラスファイルができる
 
 &nbsp;  
 <div style="text-align: center;">これで Bootstrap の成果物であるクラスがわかる！</div>
@@ -715,15 +716,14 @@ final class Sample$$Lambda implements Predicate {
 # 謎のメソッドの正体
 
 改めて、検証用の Sample.class を javap してみる  
-（private のメソッドも出力するため、`-private` をつける）
+（プライベートメソッドも出力するため、`-private` を付ける）
 
-```
+```console
 javap -private Sample
 ```
 
 --
 
-&nbsp;  
 ### 結果
 ```java
  public class Sample {
@@ -785,11 +785,6 @@ class: center, middle
 
 Java では + 演算子で文字列結合ができる
 
-```java
-// 例
-"ただいまの時刻は" + hour + "時" + minute + "分です。";
-```
-
 &nbsp;  
 この結合処理の実装が、バージョンアップで変わった  
 ([JEP 280: Indify String Concatenation](https://openjdk.org/jeps/280))
@@ -798,10 +793,10 @@ Java では + 演算子で文字列結合ができる
 
 # 結合処理の実装
 
-* Java8 まで
+* Java 8 まで
   * **コンパイル**時に**コンパイラ**が  
   StringBuilder を使って文字列結合する処理を作る
-* Java9 以降
+* Java 9 以降
   * **実行時**に invokedynamic の **Bootstrap メソッド**が  
   独自に文字列結合する処理を作る
 
@@ -817,94 +812,90 @@ Java では + 演算子で文字列結合ができる
 適当な + 演算子で文字列結合するコードを用意
 
 ```java
-private static String makeText(int hour, int minute) {
-*    return "ただいまの時刻は"
-*                 + hour + "時" + minute + "分です。";
+private static String makeText(int count) {
+*    return "Total:" + count + "files";
 }
 ```
 
-Java8 と Java9 でコンパイル → javap してみる
+Java 8 と Java 9 でコンパイル → javap してみる
 
 ---
 
-# Java8 の javap 結果
+# Java 8 の javap 結果
 
 ```console
- 0: new           #8    // class StringBuilder
+ 0: new           #5    / class StringBuilder
  3: dup
- 4: invokespecial #9    // Method StringBuilder."<init>":()V
- 7: ldc           #10   // String ただいまの時刻は
- 9: invokevirtual #11   // Method StringBuilder.append:(LString;)LStringBuilder;
+ 4: invokespecial #6    / Method StringBuilder."<init>":()V
+ 7: ldc           #7    / String Total:
+ 9: invokevirtual #8    / Method StringBuilder.append:(LString;)LStringBuilder;
 12: iload_0
-13: invokevirtual #12   // Method StringBuilder.append:(I)LStringBuilder;
-16: ldc           #13   // String 時
-18: invokevirtual #11   // Method StringBuilder.append:(LString;)LStringBuilder;
-21: iload_1
-22: invokevirtual #12   // Method StringBuilder.append:(I)LStringBuilder;
-25: ldc           #14   // String 分です。
-27: invokevirtual #11   // Method StringBuilder.append:(LString;)LStringBuilder;
-30: invokevirtual #15   // Method StringBuilder.toString:()LString;
-33: areturn
+13: invokevirtual #9   // Method StringBuilder.append:(I)LStringBuilder;
+16: ldc           #10  // String files
+18: invokevirtual #8   // Method StringBuilder.append:(LString;)LStringBuilder;
+21: invokevirtual #11  // Method StringBuilder.toString:()LString;
+24: areturn
 ```
 
 ---
 
-# Java8 の javap 結果 (概要)
+# Java 8 の javap 結果 (概要)
 
 * `StringBuilder` に、ひとつづつ `.append` していく
 * 最後に `.toString()` で `String` を生成
 
+&nbsp;  
 ```java
 new StringBuilder()
-    .append("ただいまの時刻は")
-    .append(10)
-    .append("時")
-    .append(30)
-    .append("分です。")
+    .append("Total:")
+    .append(count)
+    .append("files")
     .toString()
 ```
 
 ---
 
-# Java9 の javap 結果
+# Java 9 の javap 結果
 
 ```console
-* 2: invokedynamic #38,  0
-*      // InvokeDynamic
-*      //   #0:makeConcatWithConstants:(II)L/String;
-  7: areturn
+*  1: invokedynamic #5,  0
+*        // InvokeDynamic #0:makeConcatWithConstants:
+*              (I)Ljava/lang/String;
 -------
 BootstrapMethods:
-  0: #50 REF_invokeStatic
-      java/lang/invoke/StringConcatFactory
-                          .makeConcatWithConstants:
-     (中略)Ljava/lang/invoke/CallSite;
-  Method arguments:
-       #48 ただいまの時刻は\u0001時\u0001分です。
+  0: #25 REF_invokeStatic
+    java/lang/invoke/StringConcatFactory
+    .makeConcatWithConstants:
+    (
+      LMethodHandles$Lookup;LString;LMethodType;LString;[LObject;
+    )LCallSite;
+    Method arguments:
+      #26 Total:\u0001files
 ```
 
 ---
 
-# Java9 の javap 結果
+# Java 9 の javap 結果
 
 ```console
-  2: invokedynamic #38,  0
-       // InvokeDynamic
-       //   #0:makeConcatWithConstants:(II)L/String;
-  7: areturn
+   1: invokedynamic #5,  0
+         // InvokeDynamic #0:makeConcatWithConstants:
+               (I)Ljava/lang/String;
 -------
 BootstrapMethods:
-  0: #50 REF_invokeStatic
-*     java/lang/invoke/StringConcatFactory
-*                         .makeConcatWithConstants:
-     (中略)Ljava/lang/invoke/CallSite;
-  Method arguments:
-*      #48 ただいまの時刻は\u0001時\u0001分です。
+  0: #25 REF_invokeStatic 
+*   java/lang/invoke/StringConcatFactory
+*   .makeConcatWithConstants:
+    (
+      LMethodHandles$Lookup;LString;LMethodType;LString;[LObject;
+    )LCallSite;
+    Method arguments:
+*     #26 Total:\u0001files
 ```
 
 ---
 
-# Java9 の javap 結果 (概要)
+# Java 9 の javap 結果 (概要)
 
 * invokeDynamic の Bootstrap で、メソッドを作る  
   * Bootstrap には、テンプレート文字列を渡す
@@ -914,8 +905,8 @@ BootstrapMethods:
 
 class: center, middle
 
-# それぞれ実行した時の
-# 動きを追ってみましょう
+# Java 8 と Java 9 で
+# 実行した時の動きを追ってみましょう
 
 ---
 
@@ -926,7 +917,7 @@ class: center, middle
 ```
 
 * StringBuilder を new する  
-→ 内部にバッファ(配列)ができあがる
+→ 内部でバッファ(配列)を作る
 
 .dotted[
 ```java
@@ -939,17 +930,17 @@ class: center, middle
 # Java 8 の実行時の動き
 
 ```java
-*    .append("ただいまの時刻は")
+*    .append("Total:")
 ```
 
 * 文字列を引数に `.append()` メソッドを呼ぶ  
-→ バッファ(配列)に文字列がセットされる
+→ 文字列をバッファ(配列)に格納
 
 .dotted[
 ```java
-         ただいまの時刻は  
-         ↓↓↓↓↓↓↓↓
-byte[] { □□□□□□□□□□□□□□□□ }
+        "Ｔｏｔａｌ："
+         ↓↓↓↓↓↓
+byte[] { □□□□□□□□□□ }
 ```
 ]
 
@@ -962,13 +953,13 @@ byte[] { □□□□□□□□□□□□□□□□ }
 ```
 
 * 数値を引数に `.append()` メソッドを呼ぶ  
-→ バッファ(配列)に数値がセットされる
+→ 数値を文字列に変換して、バッファ(配列)に格納
 
 .dotted[
 ```java
-                         １０  
-                         ↓↓  
-byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;□□□□□□□□ }
+              10 → "１０"  
+                     ↓↓  
+byte[] { Ｔｏｔａｌ：□□□□ }
 ```
 ]
 
@@ -977,17 +968,17 @@ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#
 # Java 8 の実行時の動き
 
 ```java
-*    .append("時")
+*    .append("files")
 ```
 
 * 文字列を引数に `.append()` メソッドを呼ぶ  
-→ バッファ(配列)に文字列がセットされる
+→ バッファ(配列)に …、**空きが足りない**
 
 .dotted[
 ```java
-                             時  
-                             ↓   
-byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;□□□□□□ }
+                        "ｆｉｌｅｓ"
+                         ↓↓↓↓↓
+byte[] { Ｔｏｔａｌ：１０□□ }
 ```
 ]
 
@@ -995,18 +986,13 @@ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#
 
 # Java 8 の実行時の動き
 
-```java
-*    .append(30)
-```
-
-* 数値を引数に `.append()` メソッドを呼ぶ  
-→ バッファ(配列)に数値がセットされる
+→ 新しいバッファを作り、内容をコピー
 
 .dotted[
 ```java
-                               ３０  
-                               ↓↓   
-byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;□□□□□ }
+byte[] { Ｔｏｔａｌ：１０□□ }
+         ↓↓↓↓↓↓↓↓↓↓
+byte[] { □□□□□□□□□□□□□□□□□□□□ }
 ```
 ]
 
@@ -1014,47 +1000,14 @@ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#
 
 # Java 8 の実行時の動き
 
-```java
-*    .append("分です。")
-```
-
-* 文字列を引数に `.append()` メソッドを呼ぶ  
-→ バッファ(配列)に …、**バッファに空きが足りない**
-
-.dotted[
-```java
-                                   分です。  
-                                   ↓↓↓↓  
-byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;□□□ }
-```
-]
-
----
-
-# Java 8 の実行時の動き
-
-→ 新しいバッファが作られ、内容がコピーされる
-
-.dotted[
-```java
-byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;□□□ }
-          ↓↓↓↓↓↓↓↓↓↓↓↓↓
-byte[] { □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ }
-```
-]
-
----
-
-# Java 8 の実行時の動き
-
-→ バッファ(配列)に文字列がセットされる
+→ バッファ(配列)に文字列を格納
 
 
 .dotted[
 ```java
-                                   分です。  
-                                   ↓↓↓↓  
-byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;□□□□□□□□□□□□□□□□□□□ }
+                        "ｆｉｌｅｓ"  
+                         ↓↓↓↓↓  
+byte[] { Ｔｏｔａｌ：１０□□□□□□□□□□□□ }
 ```
 ]
 
@@ -1067,13 +1020,13 @@ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#
 ```
 
 *  `.toString()` メソッドを呼ぶ  
-→ バッファから String にコピーする
+→ バッファから String にコピー
 
 .dotted[
 ```java
-    byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;０&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE;□□□□□□□□□□□□□□□ }
-             ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-  new String(□□□□□□□□□□□□□□□□□)
+    byte[] { Ｔｏｔａｌ：１０ｆｉｌｅｓ□□□□□□□ }
+             ↓↓↓↓↓↓↓↓↓↓↓↓↓
+  new String(□□□□□□□□□□□□□)
 ```
 ]
 
@@ -1087,7 +1040,7 @@ byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#
 
 ---
 
-# Java9 以降の場合
+# Java 9 以降の場合
 
 invokeDymamic を実行する  
 → 最初に Bootstrap メソッドを呼び出す
@@ -1095,29 +1048,31 @@ invokeDymamic を実行する
 ```console
 * 2: invokedynamic #38,  0
 *      // InvokeDynamic
-*      //   #0:makeConcatWithConstants:(II)L/String;
+*      //   #0:makeConcatWithConstants:(I)L/String;
 ```
 
 ---
 
-# Java9 以降の場合 (Bootstrap)
+# Java 9 以降の場合 (Bootstrap)
 
-「ただいまの時刻は<span class="undeline">\u0001</span>時<span class="undeline">\u0001</span>分です。」を
+「Total:<sapn class="underline">\u0001</sapn>files」を
 引数に StringConcatFactory.makeConcatWithConstants を呼ぶ
 
 ```console
 BootstrapMethods:
-  0: #50 REF_invokeStatic
-*     java/lang/invoke/StringConcatFactory
-*                       .makeConcatWithConstants:
-      (中略)Ljava/lang/invoke/CallSite;
-  Method arguments:
-*      #48 ただいまの時刻は\u0001時\u0001分です。
+  0: #25 REF_invokeStatic 
+*   java/lang/invoke/StringConcatFactory
+*   .makeConcatWithConstants:
+    (
+      LMethodHandles$Lookup;LString;LMethodType;LString;[LObject;
+    )LCallSite;
+    Method arguments:
+*     #26 Total:\u0001files
 ```
 
 ---
 
-# Java9 以降の場合 (in Bootstrap)
+# Java 9 以降の場合 (in Bootstrap)
 
 Boostrap は、文字列を結合するメソッドを作って返す
 
@@ -1137,7 +1092,7 @@ public static CallSite makeConcatWithConstants(
 
 ---
 
-# Java9 以降の場合 (in Bootstrap)
+# Java 9 以降の場合 (in Bootstrap)
 
 Boostrap は、文字列を結合するメソッドを作って返す
 
@@ -1151,17 +1106,20 @@ Boostrap は、文字列を結合するメソッドを作って返す
 
 ---
 
-# Java9 以降の場合 (after Bootstrap)
+# Java 9 以降の場合 (after Bootstrap)
 
 invokeDymamic を実行する  
 → 最初に Bootstrap メソッドを呼び出す  
-→ 以降、<span style="text-decoration: underline;">生成されたメソッド</span>を呼び出す
+→ 以降、<span style="text-decoration: underline;">生成されたクラスのメソッド</span>を呼び出す
 
+--
+<span style="margin-left: 8em;">↑</span>  
+<span style="margin-left: 6.5em;">気になる</span>  
 ---
 
 # 生成されたメソッドの詳細
 
-* 気になるが、文字列結合の Bootstrap メソッドには  
+* 文字列結合の Bootstrap メソッドには  
 生成したメソッドを出力する機能がない
 
 → どうするか
@@ -1174,16 +1132,16 @@ invokeDymamic を実行する
 ---
 
 ```java
-String LambdaForm$MH/0x00007a15ef006000(int var0, int var1) {
+String LambdaForm$MH/0x00007a15ef006000(int var0) {
   // 長さの計算
-  long indexCoder = 9 + StringConcatHelper.UTF16;
+  long indexCoder = 11 + StringConcatHelper.LATIN1;
   indexCoder += StringConcatHelper.mix(indexCoder, var0);
-  indexCoder += StringConcatHelper.mix(indexCoder, var1);
 
-  // バッファ（配列）を作って文字列を詰める
-  byte[] buf = StringConcatHelper.newArray("分です。", indexCoder);
-  indexCoder = StringConcatHelper.prepend(indexCoder, buf, var1, "時");
-  indexCoder = StringConcatHelper.prepend(indexCoder, buf, var0, "ただいまの時刻は");
+  // バッファ（配列）を作って文字列を格納
+  byte[] buf = 
+    StringConcatHelper.newArray("files", indexCoder);
+  indexCoder = 
+    StringConcatHelper.prepend(indexCoder, buf, var1, "Total:");
 
   // String にする
   return new String(buf);
@@ -1195,17 +1153,12 @@ String LambdaForm$MH/0x00007a15ef006000(int var0, int var1) {
 # 生成されたメソッドのシグネチャ
 
 ```java
-static String LambdaForm$MH/0x00007a15ef006000
-  (int var0, int var1)
-{
+static String LambdaForm$MH/0x00007a15ef006000(int var0)
 ```
 
 &nbsp;  
-int 型の引数を2つとり、文字列を返すメソッド  
-→ 定数以外の部分を引数で受けとる  
-&nbsp;  
-※ 今回であれば、変数 hour, minute を受けとる
-
+定数以外の部分を引数で受けとり、文字列を返すメソッド  
+→ 今回は int 型の引数を1つ取る
 
 ---
 
@@ -1213,25 +1166,24 @@ int 型の引数を2つとり、文字列を返すメソッド
 
 ```java
 // 長さの計算
-long indexCoder = 9 + StringConcatHelper.UTF16;
+long indexCoder = 11 + StringConcatHelper.LATIN1;
 indexCoder += StringConcatHelper.mix(indexCoder, var0);
-indexCoder += StringConcatHelper.mix(indexCoder, var1);
 ```
 
-* `indexCoder` が、文字列の長さと種類
-  * 定数の 9 \+ 引数0の長さ \+ 引数1の長さ
-      * 9 は "ただいまの時刻は" と "時" の文字数の合計
-
+* `indexCoder` は <span class="underline">文字列の長さ</span> + <span class="underline">種類</span>
+  * 定数 11 (= "Total:" と "files" の文字数の合計)
+  * \+ 種類 LATIN1 (= 0x0) / UTF16 (= 0x1_0000_0000)
+  * \+ 引数0 (数値) の長さ
 ---
 
 ```java
 byte[] buf = 
-*  StringConcatHelper.newArray("分です。", indexCoder);
+*  StringConcatHelper.newArray("files", indexCoder);
 ```
 
 `newArray` でやっていること  
 → 指定された長さのバッファ(配列)を作る  
-→ バッファに文字列を入れる  
+→ 文字列をバッファに格納  
 → 現在の位置を返す
 
 <!--
@@ -1241,29 +1193,9 @@ byte[] buf =
 
 .dotted[
 ```java
-                                     分です。
-                                     ↓↓↓↓
-  byte[] { ・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE; }
-```
-]
-
----
-
-```java
-indexCoder = 
-*  StringConcatHelper.prepend(
-*      indexCoder, buf, var1, "時");
-```
-
-`prepend` でやっていること  
-→ バッファの指定された位置に引数1と文字列を入れる  
-→ 現在の位置を返す
-
-.dotted[
-```java
-                               時３０
-                               ↓↓↓
-  byte[] { ・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE; }
+                          "ｆｉｌｅｓ"
+                           ↓↓↓↓↓
+  byte[] { ・・・・・・・・・・・・・ }
 ```
 ]
 
@@ -1272,18 +1204,18 @@ indexCoder =
 ```java
 indexCoder =
 *  StringConcatHelper.prepend(
-*      indexCoder, buf, var0, "ただいまの時刻は");
+*      indexCoder, buf, var0, "Total:");
 ```
 
 `prepend` でやっていること  
-→ バッファの指定された位置に引数0と文字列を入れる  
+→ 数値と文字列をバッファの指定された位置に格納  
 → 現在の位置を返す
 
 .dotted[
 ```java
-           ただいまの時刻は１０
-           ↓↓↓↓↓↓↓↓↓↓
-  byte[] { ・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;・&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE; }
+          "Ｔｏｔａｌ：１０"
+           ↓↓↓↓↓↓↓↓
+  byte[] { ・・・・・・・・ｆｉｌｅｓ }
 ```
 ]
 
@@ -1298,7 +1230,7 @@ String を作る
 
 .dotted[
 ```java
-  byte[] { た&#x20DE;だ&#x20DE;い&#x20DE;ま&#x20DE;の&#x20DE;時&#x20DE;刻&#x20DE;は&#x20DE;１&#x20DE;３&#x20DE;時&#x20DE;３&#x20DE;０&#x20DE;分&#x20DE;で&#x20DE;す&#x20DE;。&#x20DE; }
+  byte[] { Ｔｏｔａｌ：１０ｆｉｌｅｓ }
            ↓
   String(value, coder);
 ```
@@ -1308,28 +1240,53 @@ String を作る
 
 # 実行結果の比較
 
-* Java8 まで
+* Java 8 まで
   * StringBuilder を使った処理
   * ちょっとずつバッファに文字列を足していく
   * バッファの作り直しが発生する
-* Java9 以降
-  * 独自の処理
+* Java 9 以降
+  * invokeDynamic を使った処理
   * 必要な長さを計算して、バッファを作る
-  * バッファの作り直しは発生しない
+  * バッファの作り直しが発生しない
+
+実行時の処理は、**Java 9 以降の方は無駄がない**
+---
+
+# invokeDynamic の可能性
+
+* invokeDynamic を使えば実行時に処理を差し込める
+  * Java でも需要がある
+  * 最適な処理を生成しやすい
+
+&nbsp;  
+さらに、まだ Java で使っていない機能も持っている
+* CallSite の更新
+  * Java でも動的ディスパッチしたい場合がでてきたら使うかも！？
 
 ---
 
 # まとめ
 
-* javap してわかったこと
-  * Java8 まで
-      * **コンパイル**時に**コンパイラ**が  
-      StringBuilder を使って文字列結合する処理を作る
-  * Java9 以降
-      * **実行時**に invokedynamic の **Bootstrap メソッド**が  
-      独自に文字列結合する処理を作る
+* もともと invokeDynamic は JVM で動的型付け言語を  
+効率的に処理するために実装された  
+* 現在は、Java でも使っている
+  * Lambda の実装
+  * 文字列結合の処理生成  など
+* 結果、効率の良い処理が実現された
 
-実行時の処理は、**Java9 以降の方は無駄がない**
+&nbsp;  
+今後もさらに使われるようになるかもしれません
+
+---
+
+class: center, middle
+
+# InvokeDynamic,
+# Under the Hood
+
+&nbsp;  
+YujiSoftware  
+Yuichi Sakuraba
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
