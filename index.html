@@ -38,6 +38,10 @@
     .remark-slide-content h3 {
       font-size:40px; /* 35px */
     }
+    .remark-slide-content .highlight {
+      color: darkred;
+      font-weight: bold;
+    }
     .remark-code {
       font-size:36px; /* 18px */
       background-color: #EFEFEF;
@@ -420,10 +424,12 @@ Java のどこで InvokeDynamic が使われている？（Java22時点）
 
 .move[
 * Lambda
-* String concat （+ 演算子による文字列結合）
 * Pattern Matching for switch
 * Recod class
-  * toString, hashCode, equals メソッドの実装）
+  * toString, hashCode, equals メソッドの実装
+* String Concatenation（Java 9〜） <!-- https://openjdk.org/jeps/280 -->
+  * +演算子による文字列結合
+* Refrection API（Java 18 〜）<!-- https://openjdk.org/jeps/416 -->
 ]
 
 ---
@@ -442,6 +448,51 @@ public boolean isOdd(java.util.List<java.lang.Integer>);
             // InterfaceMethod java/util/stream/Stream.allMatch:(Ljava/util/function/Predicate;)Z
  16: ireturn
 ```
+
+---
+
+class: center, middle
+
+# invokeDynamic の動作
+
+---
+
+class: center, middle
+
+# <span style="text-decoration: underline;">invoke</span>  
+↓   
+メソッドを**実行**する  
+
+---
+
+class: center, middle
+
+
+# <span style="text-decoration: underline;">dynamic</span>  
+↓   
+**動的に**
+
+---
+
+# invokeDynamic とは
+
+対象のメソッドを<span style="text-decoration: underline;">動的に決定して</span>、実行する
+
+--
+
+<span style="margin-left: 10.5em;">↓</span>   
+<span style="margin-left: 8em;">いつ決定する？</span>  
+<span style="margin-left: 8em;">どうやって決定する？</span>
+
+---
+
+<!-- # 処理の流れ -->
+
+**Bootstrapメソッド** … 実行するメソッドを決定する処理  
+**Lookupクラス**<span style="margin-left: 2.3em;">…</span> メソッドを検索するためのクラス  
+**CallSiteクラス**<span style="margin-left: 2.3em;">…</span> 実行対象のMethodHandleを保持  
+**MethodHandleクラス** … メソッドの参照  
+<img src="images/bootstrap.jpg" style="width: 90%; margin: 1em;">
 
 ---
 class: center, middle
