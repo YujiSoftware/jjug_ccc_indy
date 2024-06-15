@@ -589,12 +589,51 @@ public final class LambdaMetafactory {
 
 ---
 
+# InnerClassLambdaMetafactory
+
+**ASM**(Java バイトコード操作フレームワーク)を使い、  
+**直接バイトコードを組み立てて**クラスを作っている
+
+```java
+MethodVisitor ctor = 
+    cw.visitMethod(ACC_PRIVATE, NAME_CTOR,
+      constructorType.toMethodDescriptorString(),
+      null, null);
+ctor.visitCode();
+ctor.visitVarInsn(ALOAD, 0);
+ctor.visitMethodInsn(
+    INVOKESPECIAL, JAVA_LANG_OBJECT, NAME_CTOR,
+    METHOD_DESCRIPTOR_VOID, false);
+```
+
+---
+
+# buildCallSite() の処理
+
+生成したクラスのインスタンス生成メソッドを CallSite として返す
+
+```java
+if (factoryType.parameterCount() == 0) {
+    // In the case of a non-capturing lambda, we 
+*   // optimize linkage by pre-computing a single instance
+    Object inst = mh.asType(methodType(Object.class))
+      .invokeExact();
+    return new ConstantCallSite(
+      MethodHandles.constant(interfaceClass, inst));
+} else {
+    return new ConstantCallSite(mh.asType(factoryType));
+}
+```
+
+---
+
 # ここまでのまとめ
 
 1. ラムダ式の処理は invokeDynamic を使っている
 2. invokeDynamic の Bootstrap メソッドでは、  
-**クラスを生成している**
-3. 生成したクラスを、CallSite としている
+直接バイトコードを組み立てて**クラスを生成している**
+3. 生成したクラスのインスタンス生成メソッドを、  
+CallSite としている
 
 ---
 
@@ -608,12 +647,17 @@ class: center, middle
 
 * ラムダの Bootstrap メソッドで使用している `InnerClassLambdaMetafactory` クラスには、**生成したクラスの出力機能**がある
 
-システムプロパティを指定して実行する  
-<span class="underline">-Djdk.invoke.LambdaMetafactory.dumpProxyClassFiles</span>  
-→ DUMP_LAMBDA_PROXY_CLASS_FILES という  
-　 ディレクトリにクラスファイルができる
+---
 
-<div style="text-align: center;">これで Bootstrap の成果物がわかる！</div>
+# 生成したクラスの出力機能
+
+* システムプロパティを指定して実行する  
+<span class="underline" style="font-size: 36px;">-Djdk.invoke.LambdaMetafactory.dumpProxyClassFiles</span>  
+* DUMP_LAMBDA_PROXY_CLASS_FILES という  
+ディレクトリにクラスファイルができる
+
+&nbsp;  
+<div style="text-align: center;">これで Bootstrap の成果物であるクラスがわかる！</div>
 
 ---
 
