@@ -467,7 +467,7 @@ class: center, middle
   * 小さな処理を簡単に書けるようにしたもの
   * 実体は、<span class="underline">関数型</span>  
   <span class="underline">インタフェースを実装したクラスのインスタンス</span>
-  
+
 <span style="margin-left: 12em;">↑</span>  
 <span style="margin-left: 2em;">**これを用意するのに invokeDynamic を使っている**</span>
 
@@ -500,14 +500,35 @@ public class Sample {
 
 1. `javac` でコンパイル
 2. `javap` でリバースアセンブルする   
-（バイトコードを出力するため、`-c` をつける）
+（詳細を出力するため、`-v` をつける）
 
 &nbsp;  
 
 ```
 javac Sample.java
-javap -c Sample.class
+javap -v Sample.class
 ```
+
+&nbsp;  
+→ いろいろなことがわかる
+
+---
+
+# javap -v でわかること
+
+**クラスファイルの中身が分かる**
+
+* クラス定義・定数プール・フィールド定義
+* メソッド
+  * 定義
+  * **バイトコード**
+  * デバッグ情報(あれば)
+* 属性
+  * **invokeDynamic で呼び出す Bootstrap メソッド**
+  * レコードクラスの定義&nbsp;&nbsp;&nbsp; etc...
+
+<!-- 今回確認したいのは、強調したところ -->
+<!-- 詳しくは、[javapを使ってクラスファイルを読んでみよう！ - Speaker Deck](https://speakerdeck.com/yujisoftware/javapwoshi-tutekurasuhuairuwodu-ndemiyou)  -->
 
 ---
 
