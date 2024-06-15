@@ -76,6 +76,10 @@ class: center, middle
 # InvokeDynamic,
 # Under the Hood
 
+&nbsp;  
+YujiSoftware  
+Yuichi Sakuraba
+
 <!-- Agenda はあえて出さない -->
 
 ---
@@ -499,13 +503,13 @@ public class Sample {
 
 1. `javac` でコンパイル
 2. `javap` でリバースアセンブルする   
-（詳細を出力するため、`-v` をつける）
+（詳細を出力するため、`-verbose` をつける）
 
 &nbsp;  
 
 ```
 javac Sample.java
-javap -v Sample.class
+javap -verbose Sample.class
 ```
 
 &nbsp;  
@@ -513,7 +517,7 @@ javap -v Sample.class
 
 ---
 
-# javap -v でわかること
+# javap -verbose でわかること
 
 **クラスファイルの中身が分かる**
 
@@ -682,10 +686,10 @@ final class Sample$$Lambda implements Predicate {
 # 謎のメソッドの正体
 
 改めて、検証用の Sample.class を javap してみる  
-（全部のメソッド一覧を出力するため、`-p` をつける）
+（private のメソッドも出力するため、`-private` をつける）
 
 ```
-javap -p Sample
+javap -private Sample
 ```
 
 --
@@ -1136,8 +1140,7 @@ invokeDymamic を実行する
 --
 
 &nbsp;  
-→ **メソッド生成処理を読み解けばいい！**  
-※ 本日は時間がないので、結果だけ説明
+→ **メソッド生成処理を読み解けばいい！**
 
 ---
 
