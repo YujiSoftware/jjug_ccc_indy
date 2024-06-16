@@ -8,5 +8,5 @@ InvokeDynamic、略して “Indy” をご存じですか。
 
 ## Author
 
-YujiSoftware
-Sakuraba Yuichi
+- YujiSoftware
+- Yuichi Sakuraba
